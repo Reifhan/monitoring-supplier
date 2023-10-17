@@ -243,7 +243,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
   String searchTextBulanTahunDitemukan = "";
 
   final _formKey = GlobalKey<FormState>();
-
+  final TextEditingController _timestampController = TextEditingController();
   final TextEditingController _namaSupplierController = TextEditingController();
   final TextEditingController _namaPartController = TextEditingController();
   final TextEditingController _kodePartController = TextEditingController();
@@ -842,6 +842,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
 
   Future<void> _detail([DocumentSnapshot? documentSnapshot]) async {
     if (documentSnapshot != null) {
+      _timestampController.text = documentSnapshot["timeStamp"];
       _namaSupplierController.text = documentSnapshot["namaSupplier"];
       _namaPartController.text = documentSnapshot["namaPart"];
       _kodePartController.text = documentSnapshot["kodePart"];
@@ -882,6 +883,51 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                     key: _formKey,
                     child: Column(
                       children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Time Stamp',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Required!';
+                              }
+                              return null;
+                            },
+                            controller: _timestampController,
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.all(20),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.green,
+                                  width: 2,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.black,
+                                  width: 2,
+                                ),
+                              ),
+                              hintText: 'TimeStamp',
+                            ),
+                            readOnly: true,
+                          ),
+                        ),
                         const SizedBox(
                           height: 10,
                         ),

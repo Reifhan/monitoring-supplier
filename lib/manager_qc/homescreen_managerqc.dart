@@ -612,6 +612,7 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                                   .collection('bulan')
                                   .doc(widget.documentIdBulan)
                                   .collection('data_part_defect')
+                                  .orderBy("namaPart", descending: false)
                                   .snapshots(),
                               builder: (ctx, streamSnapshot) {
                                 if (streamSnapshot.connectionState ==

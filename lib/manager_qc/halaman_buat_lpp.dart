@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -17,6 +17,35 @@ class HalamanBuatLPP extends StatefulWidget {
 }
 
 class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
+  late Stream<DateTime> timerStream;
+  late StreamSubscription<DateTime> timerSubscription;
+  DateTime currentDateTime = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Create a Stream that emits a DateTime every second
+    timerStream = Stream.periodic(const Duration(seconds: 1), (count) {
+      currentDateTime = DateTime.now();
+      return currentDateTime;
+    });
+
+    // Subscribe to the timerStream
+    timerSubscription = timerStream.listen((dateTime) {
+      setState(() {
+        currentDateTime = dateTime;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    timerSubscription.cancel();
+    _bulanTahunDitemukanController.dispose();
+    super.dispose();
+  }
+
   final _storage = FirebaseStorage.instance;
   final _picker = ImagePicker();
   File? _image;
@@ -121,14 +150,8 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
     _bulanTahunDitemukanController.text = formattedDate;
   }
 
-  @override
-  void dispose() {
-    _bulanTahunDitemukanController.dispose();
-    super.dispose();
-  }
-
   final _formKey = GlobalKey<FormState>();
-
+  final TextEditingController _timestampController = TextEditingController();
   final TextEditingController _namaSupplierController = TextEditingController();
   final TextEditingController _namaPartController = TextEditingController();
   final TextEditingController _kodePartController = TextEditingController();
@@ -674,6 +697,8 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                     ),
                                     onPressed: () async {
                                       if (_formKey.currentState!.validate()) {
+                                        final String timeStamp =
+                                            _timestampController.text;
                                         final String namaSupplier =
                                             _namaSupplierController.text;
                                         final String namaPart =
@@ -699,6 +724,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                           await FirebaseFirestore.instance
                                               .collection('lpp')
                                               .add({
+                                            "timeStamp": timeStamp,
                                             "namaSupplier": namaSupplier,
                                             "namaPart": namaPart,
                                             "kodePart": kodePart,
@@ -715,6 +741,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                         }
 
                                         // Clear the text fields
+                                        _timestampController.text = "";
                                         _namaSupplierController.text = "";
                                         _namaPartController.text = "";
                                         _kodePartController.text = "";
@@ -752,6 +779,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
     String action = "create";
     if (documentSnapshot != null) {
       action = "update";
+      _timestampController.text = documentSnapshot["timeStamp"];
       _namaSupplierController.text = documentSnapshot["namaSupplier"];
       _namaPartController.text = documentSnapshot["namaPart"];
       _kodePartController.text = documentSnapshot["kodePart"];
@@ -1284,6 +1312,8 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                   ),
                                   onPressed: () async {
                                     if (_formKey.currentState!.validate()) {
+                                      final String timeStamp =
+                                          _timestampController.text;
                                       final String namaSupplier =
                                           _namaSupplierController.text;
                                       final String namaPart =
@@ -1310,6 +1340,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                             .collection('lpp')
                                             .doc(documentSnapshot!.id)
                                             .set({
+                                          "timeStamp": timeStamp,
                                           "namaSupplier": namaSupplier,
                                           "namaPart": namaPart,
                                           "kodePart": kodePart,
@@ -1325,6 +1356,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                       }
 
                                       // Clear the text fields
+                                      _timestampController.text = "";
                                       _namaSupplierController.text = "";
                                       _namaPartController.text = "";
                                       _kodePartController.text = "";
@@ -1358,6 +1390,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
 
   Future<void> _detail([DocumentSnapshot? documentSnapshot]) async {
     if (documentSnapshot != null) {
+      _timestampController.text = documentSnapshot["timeStamp"];
       _namaSupplierController.text = documentSnapshot["namaSupplier"];
       _namaPartController.text = documentSnapshot["namaPart"];
       _kodePartController.text = documentSnapshot["kodePart"];
@@ -1398,6 +1431,51 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                     key: _formKey,
                     child: Column(
                       children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Time Stamp',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Required!';
+                              }
+                              return null;
+                            },
+                            controller: _timestampController,
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.all(20),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.green,
+                                  width: 2,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.black,
+                                  width: 2,
+                                ),
+                              ),
+                              hintText: 'TimeStamp',
+                            ),
+                            readOnly: true,
+                          ),
+                        ),
                         const SizedBox(
                           height: 10,
                         ),
@@ -1861,6 +1939,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
 
   @override
   Widget build(BuildContext context) {
+    final timestamp = currentDateTime;
     return Scaffold(
       body: Material(
         child: Container(
@@ -1960,6 +2039,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                 borderRadius: BorderRadius.circular(20),
                                 onTap: () {
                                   // Clear the text fields
+                                  _timestampController.text = "$timestamp";
                                   _namaSupplierController.text = "";
                                   _namaPartController.text = "";
                                   _kodePartController.text = "";
@@ -2101,8 +2181,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                             child: StreamBuilder<QuerySnapshot>(
                               stream: FirebaseFirestore.instance
                                   .collection('lpp')
-                                  .orderBy("bulanTahunDitemukan",
-                                      descending: true)
+                                  .orderBy("timeStamp", descending: true)
                                   .snapshots(),
                               builder: (ctx, streamSnapshot) {
                                 if (streamSnapshot.connectionState ==
