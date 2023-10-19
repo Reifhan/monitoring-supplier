@@ -398,6 +398,12 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                                 persentasePartDefect,
                                             "statusValidasi": statusValidasi,
                                           });
+
+                                          await FirebaseFirestore.instance
+                                              .collection('notif')
+                                              .add({
+                                            "notif": "Data ditambahkan: ",
+                                          });
                                         }
 
                                         // Clear the text fields

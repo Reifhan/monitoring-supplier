@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:html' as html;
+
+import 'package:printing/printing.dart';
 
 class PDFScreen extends StatelessWidget {
   final Uint8List pdfBytes;
@@ -25,7 +28,7 @@ class PDFScreen extends StatelessWidget {
               ..click();
             html.Url.revokeObjectUrl(url);
           },
-          child: const Text('Open PDF'),
+          child: const Text('Download PDF'),
         ),
       ),
     );
@@ -60,177 +63,192 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
     final jumlahPart = document['jumlahPart'].toString();
     final waktuDitemukan = document['bulanTahunDitemukan'].toString();
     final keteranganDefect = document['keteranganDefect'].toString();
-    final ilustrasi = document['ilustrasi'].toString();
     final request = document['request'].toString();
 
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Column(
-            children: [
-              pw.Table(
-                border: pw.TableBorder.all(color: PdfColors.black),
-                children: [
-                  pw.TableRow(
-                    children: [
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(
-                          'Nama Supplier',
-                          textAlign: pw.TextAlign.center,
-                          style: pw.TextStyle(
-                            fontWeight: pw.FontWeight.bold,
+    final ByteData data = await rootBundle.load('assets/images/wima-logo.png');
+    final Uint8List bytes = data.buffer.asUint8List();
+    final imageLocal = pw.MemoryImage(bytes);
+
+    final ilustrasi = document['ilustrasi'].toString();
+    // Mendownload gambar dan menyimpannya di cache sementara
+    final file = await DefaultCacheManager().getSingleFile(ilustrasi);
+
+    if (await file.exists()) {
+      final ilustrasi = pw.MemoryImage(file.readAsBytesSync());
+
+      pdf.addPage(
+        pw.Page(
+          build: (pw.Context context) {
+            return pw.Column(
+              children: [
+                pw.Image(imageLocal, height: 50),
+                pw.SizedBox(
+                  height: 30,
+                ),
+                pw.Table(
+                  border: pw.TableBorder.all(color: PdfColors.black),
+                  children: [
+                    pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(
+                            'Nama Supplier',
+                            textAlign: pw.TextAlign.center,
+                            style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(
-                          'Nama Part',
-                          textAlign: pw.TextAlign.center,
-                          style: pw.TextStyle(
-                            fontWeight: pw.FontWeight.bold,
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(
+                            'Nama Part',
+                            textAlign: pw.TextAlign.center,
+                            style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(
-                          'Kode Part',
-                          textAlign: pw.TextAlign.center,
-                          style: pw.TextStyle(
-                            fontWeight: pw.FontWeight.bold,
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(
+                            'Kode Part',
+                            textAlign: pw.TextAlign.center,
+                            style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Model Part',
-                            textAlign: pw.TextAlign.center,
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                            )),
-                      ),
-                    ],
-                  ),
-                  pw.TableRow(
-                    children: [
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(namaSupplier),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(namaPart),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(kodePart),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(modelPart),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              pw.SizedBox(
-                height: 10,
-              ),
-              pw.Table(
-                border: pw.TableBorder.all(color: PdfColors.black),
-                children: [
-                  pw.TableRow(
-                    children: [
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Jumlah Part',
-                            textAlign: pw.TextAlign.center,
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                            )),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Waktu Ditemukan',
-                            textAlign: pw.TextAlign.center,
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                            )),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Keterangan Defect',
-                            textAlign: pw.TextAlign.center,
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                            )),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Request',
-                            textAlign: pw.TextAlign.center,
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                            )),
-                      ),
-                    ],
-                  ),
-                  pw.TableRow(
-                    children: [
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(jumlahPart),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(waktuDitemukan),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(keteranganDefect),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(request),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              pw.SizedBox(
-                height: 10,
-              ),
-              pw.Table(
-                border: pw.TableBorder.all(color: PdfColors.black),
-                children: [
-                  pw.TableRow(
-                    children: [
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Ilustrasi',
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                            )),
-                      ),
-                    ],
-                  ),
-                  pw.TableRow(
-                    children: [
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(ilustrasi),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
-    );
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text('Model Part',
+                              textAlign: pw.TextAlign.center,
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                              )),
+                        ),
+                      ],
+                    ),
+                    pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(namaSupplier),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(namaPart),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(kodePart),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(modelPart),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                pw.SizedBox(
+                  height: 10,
+                ),
+                pw.Table(
+                  border: pw.TableBorder.all(color: PdfColors.black),
+                  children: [
+                    pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text('Jumlah Part',
+                              textAlign: pw.TextAlign.center,
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                              )),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text('Waktu Ditemukan',
+                              textAlign: pw.TextAlign.center,
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                              )),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text('Keterangan Defect',
+                              textAlign: pw.TextAlign.center,
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                              )),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text('Request',
+                              textAlign: pw.TextAlign.center,
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                              )),
+                        ),
+                      ],
+                    ),
+                    pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(jumlahPart),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(waktuDitemukan),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(keteranganDefect),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(request),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                pw.SizedBox(
+                  height: 10,
+                ),
+                pw.Table(
+                  border: pw.TableBorder.all(color: PdfColors.black),
+                  children: [
+                    pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text('Ilustrasi',
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                              )),
+                        ),
+                      ],
+                    ),
+                    pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Image(ilustrasi, height: 200),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        ),
+      );
+    }
 
     return pdf.save();
   }
@@ -1566,7 +1584,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                               child: StreamBuilder<QuerySnapshot>(
                                 stream: FirebaseFirestore.instance
                                     .collection('lpp')
-                                    .orderBy("namaPart", descending: false)
+                                    .orderBy("timeStamp", descending: true)
                                     .snapshots(),
                                 builder: (ctx, streamSnapshot) {
                                   if (streamSnapshot.connectionState ==
@@ -1721,6 +1739,12 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                                         final pdfBytes =
                                                             await createPDF(
                                                                 document);
+                                                        await Printing
+                                                            .layoutPdf(
+                                                          onLayout: (PdfPageFormat
+                                                                  format) async =>
+                                                              pdfBytes,
+                                                        );
                                                         if (!mounted) return;
                                                         Navigator.push(
                                                           context,

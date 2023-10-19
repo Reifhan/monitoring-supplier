@@ -26,7 +26,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
     super.initState();
 
     // Create a Stream that emits a DateTime every second
-    timerStream = Stream.periodic(const Duration(seconds: 1), (count) {
+    timerStream = Stream.periodic(const Duration(seconds: 30), (count) {
       currentDateTime = DateTime.now();
       return currentDateTime;
     });
