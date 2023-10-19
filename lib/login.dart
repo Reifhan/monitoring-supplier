@@ -135,7 +135,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                       ),
                       const Center(
                         child: Text(
-                          "Monitoring Penilaian Supplier",
+                          "Monitoring Pengelolaan Supplier",
                           style: TextStyle(
                             fontSize: 20,
                           ),

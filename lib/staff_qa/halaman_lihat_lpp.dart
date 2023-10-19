@@ -282,6 +282,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
     String action = "create";
     if (documentSnapshot != null) {
       action = "update";
+      _timestampController.text = documentSnapshot["timeStamp"];
       _namaSupplierController.text = documentSnapshot["namaSupplier"];
       _namaPartController.text = documentSnapshot["namaPart"];
       _kodePartController.text = documentSnapshot["kodePart"];
@@ -800,6 +801,8 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                   ),
                                   onPressed: () async {
                                     if (_formKey.currentState!.validate()) {
+                                      final String timeStamp =
+                                          _timestampController.text;
                                       final String namaSupplier =
                                           _namaSupplierController.text;
                                       final String namaPart =
@@ -824,6 +827,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                             .collection('lpp')
                                             .doc(documentSnapshot?.id)
                                             .set({
+                                          "timeStamp": timeStamp,
                                           "namaSupplier": namaSupplier,
                                           "namaPart": namaPart,
                                           "kodePart": kodePart,
