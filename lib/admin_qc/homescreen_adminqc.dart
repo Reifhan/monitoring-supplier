@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +20,10 @@ class HomeScreenAdminQC extends StatefulWidget {
 }
 
 class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
+  late Stream<DateTime> timerStream;
+  late StreamSubscription<DateTime> timerSubscription;
+  DateTime currentDateTime = DateTime.now();
+
   Stream<QuerySnapshot> getData() {
     return FirebaseFirestore.instance.collection('part').snapshots();
   }
@@ -36,12 +42,26 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
   void initState() {
     super.initState();
 
+    // Create a Stream that emits a DateTime every second
+    timerStream = Stream.periodic(const Duration(seconds: 15), (count) {
+      currentDateTime = DateTime.now();
+      return currentDateTime;
+    });
+
+    // Subscribe to the timerStream
+    timerSubscription = timerStream.listen((dateTime) {
+      setState(() {
+        currentDateTime = dateTime;
+      });
+    });
+
     _jumlahPartDefectController.addListener(calculateSum);
     _jumlahTotalKedatanganController.addListener(calculateSum);
   }
 
   @override
   void dispose() {
+    timerSubscription.cancel();
     _jumlahPartDefectController.dispose();
     _jumlahTotalKedatanganController.dispose();
     super.dispose();
@@ -58,6 +78,8 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
       TextEditingController();
   final TextEditingController _statusValidasiController =
       TextEditingController();
+  final TextEditingController _notifController = TextEditingController();
+  final TextEditingController _timestampController = TextEditingController();
 
   List<DocumentSnapshot> documents = [];
 
@@ -378,6 +400,10 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                                     .text);
                                         final String statusValidasi =
                                             _statusValidasiController.text;
+                                        final String notif =
+                                            _notifController.text;
+                                        final String timeStamp =
+                                            _timestampController.text;
 
                                         if (action == "create") {
                                           await FirebaseFirestore.instance
@@ -400,13 +426,15 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                           });
 
                                           await FirebaseFirestore.instance
-                                              .collection('notif')
+                                              .collection('notifikasi')
                                               .add({
-                                            "notif": "Data ditambahkan: ",
+                                            "timeStamp": timeStamp,
+                                            "notif": notif,
                                           });
                                         }
 
                                         // Clear the text fields
+                                        _timestampController.text = "";
                                         _namaPartController.text = "";
                                         _jumlahPartDefectController.text = "";
                                         _jumlahTotalKedatanganController.text =
@@ -805,6 +833,7 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
 
   @override
   Widget build(BuildContext context) {
+    final timestamp = currentDateTime;
     return Scaffold(
       body: Material(
         child: Container(
@@ -941,20 +970,32 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              // Clear the text fields
-                              _namaPartController.text = "";
-                              _jumlahPartDefectController.text = "";
-                              _jumlahTotalKedatanganController.text = "";
-                              _persentasePartDefectController.text = "";
-                              _statusValidasiController.text =
-                                  "Belum Divalidasi";
-                              _create();
-                            },
-                            icon: const Icon(Icons.add),
-                            label: const Text("Tambah Part Defect"),
-                          ),
+                          child: StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection("nama_supplier")
+                                  .doc(widget
+                                      .documentIdSupplier) // ID OF DOCUMENT
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                var document = snapshot.data;
+                                return ElevatedButton.icon(
+                                  onPressed: () {
+                                    // Clear the text fields
+                                    _namaPartController.text = "";
+                                    _jumlahPartDefectController.text = "";
+                                    _jumlahTotalKedatanganController.text = "";
+                                    _persentasePartDefectController.text = "";
+                                    _statusValidasiController.text =
+                                        "Belum Divalidasi";
+                                    _notifController.text =
+                                        "Data ditambahkan: ${document?["namaSupplier"]}";
+                                    _timestampController.text = "$timestamp";
+                                    _create();
+                                  },
+                                  icon: const Icon(Icons.add),
+                                  label: const Text("Tambah Part Defect"),
+                                );
+                              }),
                         ),
                         Container(
                           decoration: const BoxDecoration(

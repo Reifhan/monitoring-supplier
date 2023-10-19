@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:monitoring_audit_supplier/manager_qc/halaman_buat_lpp.dart';
@@ -12,9 +13,54 @@ class HalamanUtamaMQC extends StatefulWidget {
 }
 
 class _HalamanUtamaMQCState extends State<HalamanUtamaMQC> {
+  List<DocumentSnapshot> documents = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: Drawer(
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('notifikasi')
+              .orderBy("timeStamp", descending: true)
+              .snapshots(),
+          builder: (ctx, streamSnapshot) {
+            if (streamSnapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.blue,
+                ),
+              );
+            }
+            documents = (streamSnapshot.data!).docs;
+            return ListView.builder(
+              itemCount: documents.length,
+              itemBuilder: (BuildContext context, int index) {
+                final DocumentSnapshot documentSnapshot = documents[index];
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        documentSnapshot["notif"],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        documentSnapshot["timeStamp"],
+                        style: const TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         toolbarHeight: 50,
@@ -33,10 +79,13 @@ class _HalamanUtamaMQCState extends State<HalamanUtamaMQC> {
                 ),
                 label: const Text('Logout'),
               ),
-              const Text(
-                'Selamat Datang Manager QC',
-                style: TextStyle(
-                  fontSize: 30,
+              const Padding(
+                padding: EdgeInsets.only(right: 50),
+                child: Text(
+                  'Selamat Datang Manager QC',
+                  style: TextStyle(
+                    fontSize: 30,
+                  ),
                 ),
               ),
             ],
