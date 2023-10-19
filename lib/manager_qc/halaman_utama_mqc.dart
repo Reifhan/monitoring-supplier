@@ -61,6 +61,15 @@ class _HalamanUtamaMQCState extends State<HalamanUtamaMQC> {
         ),
       ),
       appBar: AppBar(
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.notifications_active),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              tooltip: "Notifikasi",
+            ),
+          ),
+        ],
         automaticallyImplyLeading: false,
         toolbarHeight: 50,
         flexibleSpace: Container(
