@@ -32,6 +32,16 @@ class _HalamanUtamaAQCState extends State<HalamanUtamaAQC> {
                 ),
                 label: const Text('Logout'),
               ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Hero(
+                  tag: "wima-logo",
+                  child: Image.asset(
+                    'assets/images/wima-logo.png',
+                    height: 300,
+                  ),
+                ),
+              ),
               const Text(
                 'Selamat Datang Admin QC',
                 style: TextStyle(

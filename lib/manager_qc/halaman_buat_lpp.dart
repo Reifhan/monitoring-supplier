@@ -17,6 +17,37 @@ class HalamanBuatLPP extends StatefulWidget {
 }
 
 class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
+  Stream<QuerySnapshot> getDataPart() {
+    return FirebaseFirestore.instance.collection('part').snapshots();
+  }
+
+  String getSupplierForPart(String selectedPart, List<QueryDocumentSnapshot> documents) {
+    for (var doc in documents) {
+      if (doc['namaPart'] == selectedPart) {
+        return doc['namaSupplier'];
+      }
+    }
+    return "";
+  }
+
+  String getKodeForPart(String selectedPart, List<QueryDocumentSnapshot> documents) {
+    for (var doc in documents) {
+      if (doc['namaPart'] == selectedPart) {
+        return doc['kodePart'];
+      }
+    }
+    return "";
+  }
+
+  String getModelForPart(String selectedPart, List<QueryDocumentSnapshot> documents) {
+    for (var doc in documents) {
+      if (doc['namaPart'] == selectedPart) {
+        return doc['jenisPart'];
+      }
+    }
+    return "";
+  }
+
   late Stream<DateTime> timerStream;
   late StreamSubscription<DateTime> timerSubscription;
   DateTime currentDateTime = DateTime.now();
@@ -73,15 +104,12 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
     if (result != null && result.files.isNotEmpty) {
       final fileBytes = result.files.first.bytes;
       final fileName = result.files.first.name;
-      UploadTask uploadTask =
-          FirebaseStorage.instance.ref('uploads/$fileName').putData(fileBytes!);
+      UploadTask uploadTask = FirebaseStorage.instance.ref('uploads/$fileName').putData(fileBytes!);
 
       await uploadTask;
 
       if (uploadTask.snapshot.state == TaskState.success) {
-        final String downloadURL = await FirebaseStorage.instance
-            .ref('uploads/$fileName')
-            .getDownloadURL();
+        final String downloadURL = await FirebaseStorage.instance.ref('uploads/$fileName').getDownloadURL();
         setState(() {
           _ilustrasiController.text = downloadURL;
         });
@@ -99,8 +127,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
   Future<void> _uploadImage(File? imageFile) async {
     if (imageFile == null) return;
 
-    final Reference storageReference =
-        _storage.ref().child('images/${DateTime.now()}.jpg');
+    final Reference storageReference = _storage.ref().child('images/${DateTime.now()}.jpg');
     UploadTask uploadTask = storageReference.putFile(imageFile);
 
     await uploadTask;
@@ -121,8 +148,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
   }
 
   // Text fields controllers
-  final TextEditingController _searchTextBulanTahunDitemukanController =
-      TextEditingController();
+  final TextEditingController _searchTextBulanTahunDitemukanController = TextEditingController();
 
   // Search text variable
   String searchTextBulanTahunDitemukan = "";
@@ -157,14 +183,11 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
   final TextEditingController _kodePartController = TextEditingController();
   final TextEditingController _modelPartController = TextEditingController();
   final TextEditingController _jumlahPartController = TextEditingController();
-  final TextEditingController _bulanTahunDitemukanController =
-      TextEditingController();
-  final TextEditingController _keteranganDefectController =
-      TextEditingController();
+  final TextEditingController _bulanTahunDitemukanController = TextEditingController();
+  final TextEditingController _keteranganDefectController = TextEditingController();
   final TextEditingController _ilustrasiController = TextEditingController();
   final TextEditingController _requestController = TextEditingController();
-  final TextEditingController _statusValidasiController =
-      TextEditingController();
+  final TextEditingController _statusValidasiController = TextEditingController();
 
   List<DocumentSnapshot> documents = [];
 
@@ -222,6 +245,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextFormField(
+                              readOnly: true,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Required!';
@@ -229,25 +253,21 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                 return null;
                               },
                               controller: _namaSupplierController,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.all(20),
-                                focusedBorder: const OutlineInputBorder(
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.all(20),
+                                focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
                                     color: Colors.green,
                                     width: 2,
                                   ),
                                 ),
-                                enabledBorder: const OutlineInputBorder(
+                                enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
                                     color: Colors.black,
                                     width: 2,
                                   ),
                                 ),
                                 hintText: 'Nama Supplier',
-                                prefixIcon: IconButton(
-                                  onPressed: _namaSupplierController.clear,
-                                  icon: const Icon(Icons.clear),
-                                ),
                               ),
                             ),
                           ),
@@ -270,6 +290,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextFormField(
+                              readOnly: true,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Required!';
@@ -296,6 +317,50 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                   onPressed: _namaPartController.clear,
                                   icon: const Icon(Icons.clear),
                                 ),
+                                suffixIcon: StreamBuilder<QuerySnapshot>(
+                                  stream: getDataPart(),
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData) return const CircularProgressIndicator();
+
+                                    List<String> partOptions = [];
+                                    for (var doc in snapshot.data!.docs) {
+                                      partOptions.add(doc['namaPart']);
+                                    }
+
+                                    return PopupMenuButton<String>(
+                                      icon: const Icon(
+                                        Icons.arrow_drop_down,
+                                      ),
+                                      tooltip: "Pilih",
+                                      onSelected: (value) {
+                                        setState(() {
+                                          _namaPartController.text = value.toString();
+                                          // Dapatkan supplier dari Firestore dan isi TextField
+                                          _namaSupplierController.text = getSupplierForPart(
+                                            value.toString(),
+                                            snapshot.data!.docs,
+                                          );
+                                          _kodePartController.text = getKodeForPart(
+                                            value.toString(),
+                                            snapshot.data!.docs,
+                                          );
+                                          _modelPartController.text = getModelForPart(
+                                            value.toString(),
+                                            snapshot.data!.docs,
+                                          );
+                                        });
+                                      },
+                                      itemBuilder: (BuildContext context) {
+                                        return partOptions.map((String value) {
+                                          return PopupMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList();
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),
@@ -318,6 +383,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextFormField(
+                              readOnly: true,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Required!';
@@ -325,25 +391,21 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                 return null;
                               },
                               controller: _kodePartController,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.all(20),
-                                focusedBorder: const OutlineInputBorder(
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.all(20),
+                                focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
                                     color: Colors.green,
                                     width: 2,
                                   ),
                                 ),
-                                enabledBorder: const OutlineInputBorder(
+                                enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
                                     color: Colors.black,
                                     width: 2,
                                   ),
                                 ),
                                 hintText: 'Kode Part',
-                                prefixIcon: IconButton(
-                                  onPressed: _kodePartController.clear,
-                                  icon: const Icon(Icons.clear),
-                                ),
                               ),
                             ),
                           ),
@@ -366,6 +428,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextFormField(
+                              readOnly: true,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Required!';
@@ -373,25 +436,21 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                 return null;
                               },
                               controller: _modelPartController,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.all(20),
-                                focusedBorder: const OutlineInputBorder(
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.all(20),
+                                focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
                                     color: Colors.green,
                                     width: 2,
                                   ),
                                 ),
-                                enabledBorder: const OutlineInputBorder(
+                                enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
                                     color: Colors.black,
                                     width: 2,
                                   ),
                                 ),
                                 hintText: 'Model Part',
-                                prefixIcon: IconButton(
-                                  onPressed: _modelPartController.clear,
-                                  icon: const Icon(Icons.clear),
-                                ),
                               ),
                             ),
                           ),
@@ -403,7 +462,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                             child: Row(
                               children: [
                                 Text(
-                                  'Jumlah Part',
+                                  'Jumlah Part Defect',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -438,7 +497,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                     width: 2,
                                   ),
                                 ),
-                                hintText: 'Jumlah Part',
+                                hintText: 'Jumlah Part Defect',
                                 prefixIcon: IconButton(
                                   onPressed: _jumlahPartController.clear,
                                   icon: const Icon(Icons.clear),
@@ -492,8 +551,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                 ),
                                 hintText: 'Tahun-Bulan Ditemukan',
                                 prefixIcon: IconButton(
-                                  onPressed:
-                                      _bulanTahunDitemukanController.clear,
+                                  onPressed: _bulanTahunDitemukanController.clear,
                                   icon: const Icon(Icons.clear),
                                 ),
                               ),
@@ -681,8 +739,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                     style: ButtonStyle(
                                       shape: MaterialStateProperty.all(
                                         RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
+                                          borderRadius: BorderRadius.circular(30),
                                         ),
                                       ),
                                     ),
@@ -697,43 +754,28 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                     ),
                                     onPressed: () async {
                                       if (_formKey.currentState!.validate()) {
-                                        final String timeStamp =
-                                            _timestampController.text;
-                                        final String namaSupplier =
-                                            _namaSupplierController.text;
-                                        final String namaPart =
-                                            _namaPartController.text;
-                                        final String kodePart =
-                                            _kodePartController.text;
-                                        final String modelPart =
-                                            _modelPartController.text;
-                                        final num? jumlahPart = num.tryParse(
-                                            _jumlahPartController.text);
-                                        final String bulanTahunDitemukan =
-                                            _bulanTahunDitemukanController.text;
-                                        final String keteranganDefect =
-                                            _keteranganDefectController.text;
-                                        final String ilustrasi =
-                                            _ilustrasiController.text;
-                                        final String request =
-                                            _requestController.text;
-                                        final String statusValidasi =
-                                            _statusValidasiController.text;
+                                        final String timeStamp = _timestampController.text;
+                                        final String namaSupplier = _namaSupplierController.text;
+                                        final String namaPart = _namaPartController.text;
+                                        final String kodePart = _kodePartController.text;
+                                        final String modelPart = _modelPartController.text;
+                                        final num? jumlahPart = num.tryParse(_jumlahPartController.text);
+                                        final String bulanTahunDitemukan = _bulanTahunDitemukanController.text;
+                                        final String keteranganDefect = _keteranganDefectController.text;
+                                        final String ilustrasi = _ilustrasiController.text;
+                                        final String request = _requestController.text;
+                                        final String statusValidasi = _statusValidasiController.text;
 
                                         if (action == "create") {
-                                          await FirebaseFirestore.instance
-                                              .collection('lpp')
-                                              .add({
+                                          await FirebaseFirestore.instance.collection('lpp').add({
                                             "timeStamp": timeStamp,
                                             "namaSupplier": namaSupplier,
                                             "namaPart": namaPart,
                                             "kodePart": kodePart,
                                             "modelPart": modelPart,
                                             "jumlahPart": jumlahPart,
-                                            "bulanTahunDitemukan":
-                                                bulanTahunDitemukan,
-                                            "keteranganDefect":
-                                                keteranganDefect,
+                                            "bulanTahunDitemukan": bulanTahunDitemukan,
+                                            "keteranganDefect": keteranganDefect,
                                             "ilustrasi": ilustrasi,
                                             "request": request,
                                             "statusValidasi": statusValidasi,
@@ -747,8 +789,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                         _kodePartController.text = "";
                                         _modelPartController.text = "";
                                         _jumlahPartController.text = "";
-                                        _bulanTahunDitemukanController.text =
-                                            "";
+                                        _bulanTahunDitemukanController.text = "";
                                         _keteranganDefectController.text = "";
                                         _ilustrasiController.text = "";
                                         _requestController.text = "";
@@ -785,8 +826,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
       _kodePartController.text = documentSnapshot["kodePart"];
       _modelPartController.text = documentSnapshot["modelPart"];
       _jumlahPartController.text = documentSnapshot["jumlahPart"].toString();
-      _bulanTahunDitemukanController.text =
-          documentSnapshot["bulanTahunDitemukan"];
+      _bulanTahunDitemukanController.text = documentSnapshot["bulanTahunDitemukan"];
       _keteranganDefectController.text = documentSnapshot["keteranganDefect"];
       _ilustrasiController.text = documentSnapshot["ilustrasi"];
       _requestController.text = documentSnapshot["request"];
@@ -839,6 +879,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextFormField(
+                            readOnly: true,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Required!';
@@ -846,25 +887,21 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                               return null;
                             },
                             controller: _namaSupplierController,
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.all(20),
-                              focusedBorder: const OutlineInputBorder(
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.all(20),
+                              focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.green,
                                   width: 2,
                                 ),
                               ),
-                              enabledBorder: const OutlineInputBorder(
+                              enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.black,
                                   width: 2,
                                 ),
                               ),
                               hintText: 'Nama Supplier',
-                              prefixIcon: IconButton(
-                                onPressed: _namaSupplierController.clear,
-                                icon: const Icon(Icons.clear),
-                              ),
                             ),
                           ),
                         ),
@@ -887,6 +924,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextFormField(
+                            readOnly: true,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Required!';
@@ -913,6 +951,50 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                 onPressed: _namaPartController.clear,
                                 icon: const Icon(Icons.clear),
                               ),
+                              suffixIcon: StreamBuilder<QuerySnapshot>(
+                                stream: getDataPart(),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) return const CircularProgressIndicator();
+
+                                  List<String> partOptions = [];
+                                  for (var doc in snapshot.data!.docs) {
+                                    partOptions.add(doc['namaPart']);
+                                  }
+
+                                  return PopupMenuButton<String>(
+                                    icon: const Icon(
+                                      Icons.arrow_drop_down,
+                                    ),
+                                    tooltip: "Pilih",
+                                    onSelected: (value) {
+                                      setState(() {
+                                        _namaPartController.text = value.toString();
+                                        // Dapatkan supplier dari Firestore dan isi TextField
+                                        _namaSupplierController.text = getSupplierForPart(
+                                          value.toString(),
+                                          snapshot.data!.docs,
+                                        );
+                                        _kodePartController.text = getKodeForPart(
+                                          value.toString(),
+                                          snapshot.data!.docs,
+                                        );
+                                        _modelPartController.text = getModelForPart(
+                                          value.toString(),
+                                          snapshot.data!.docs,
+                                        );
+                                      });
+                                    },
+                                    itemBuilder: (BuildContext context) {
+                                      return partOptions.map((String value) {
+                                        return PopupMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList();
+                                    },
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -935,6 +1017,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextFormField(
+                            readOnly: true,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Required!';
@@ -942,25 +1025,21 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                               return null;
                             },
                             controller: _kodePartController,
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.all(20),
-                              focusedBorder: const OutlineInputBorder(
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.all(20),
+                              focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.green,
                                   width: 2,
                                 ),
                               ),
-                              enabledBorder: const OutlineInputBorder(
+                              enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.black,
                                   width: 2,
                                 ),
                               ),
                               hintText: 'Kode Part',
-                              prefixIcon: IconButton(
-                                onPressed: _kodePartController.clear,
-                                icon: const Icon(Icons.clear),
-                              ),
                             ),
                           ),
                         ),
@@ -983,6 +1062,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextFormField(
+                            readOnly: true,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Required!';
@@ -990,25 +1070,21 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                               return null;
                             },
                             controller: _modelPartController,
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.all(20),
-                              focusedBorder: const OutlineInputBorder(
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.all(20),
+                              focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.green,
                                   width: 2,
                                 ),
                               ),
-                              enabledBorder: const OutlineInputBorder(
+                              enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.black,
                                   width: 2,
                                 ),
                               ),
                               hintText: 'Model Part',
-                              prefixIcon: IconButton(
-                                onPressed: _modelPartController.clear,
-                                icon: const Icon(Icons.clear),
-                              ),
                             ),
                           ),
                         ),
@@ -1020,7 +1096,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                           child: Row(
                             children: [
                               Text(
-                                'Jumlah Part',
+                                'Jumlah Part Defect',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -1055,7 +1131,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                   width: 2,
                                 ),
                               ),
-                              hintText: 'Jumlah Part',
+                              hintText: 'Jumlah Part Defect',
                               prefixIcon: IconButton(
                                 onPressed: _jumlahPartController.clear,
                                 icon: const Icon(Icons.clear),
@@ -1312,30 +1388,19 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                   ),
                                   onPressed: () async {
                                     if (_formKey.currentState!.validate()) {
-                                      final String timeStamp =
-                                          _timestampController.text;
-                                      final String namaSupplier =
-                                          _namaSupplierController.text;
-                                      final String namaPart =
-                                          _namaPartController.text;
-                                      final String kodePart =
-                                          _kodePartController.text;
-                                      final String modelPart =
-                                          _modelPartController.text;
-                                      final num? jumlahPart = num.tryParse(
-                                          _jumlahPartController.text);
-                                      final String bulanTahunDitemukan =
-                                          _bulanTahunDitemukanController.text;
-                                      final String keteranganDefect =
-                                          _keteranganDefectController.text;
-                                      final String ilustrasi =
-                                          _ilustrasiController.text;
-                                      final String request =
-                                          _requestController.text;
-                                      final String statusValidasi =
-                                          _statusValidasiController.text;
+                                      final String timeStamp = _timestampController.text;
+                                      final String namaSupplier = _namaSupplierController.text;
+                                      final String namaPart = _namaPartController.text;
+                                      final String kodePart = _kodePartController.text;
+                                      final String modelPart = _modelPartController.text;
+                                      final num? jumlahPart = num.tryParse(_jumlahPartController.text);
+                                      final String bulanTahunDitemukan = _bulanTahunDitemukanController.text;
+                                      final String keteranganDefect = _keteranganDefectController.text;
+                                      final String ilustrasi = _ilustrasiController.text;
+                                      final String request = _requestController.text;
+                                      final String statusValidasi = _statusValidasiController.text;
 
-                                      if (action == "create") {
+                                      if (action == "update") {
                                         await FirebaseFirestore.instance
                                             .collection('lpp')
                                             .doc(documentSnapshot!.id)
@@ -1346,8 +1411,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                           "kodePart": kodePart,
                                           "modelPart": modelPart,
                                           "jumlahPart": jumlahPart,
-                                          "bulanTahunDitemukan":
-                                              bulanTahunDitemukan,
+                                          "bulanTahunDitemukan": bulanTahunDitemukan,
                                           "keteranganDefect": keteranganDefect,
                                           "ilustrasi": ilustrasi,
                                           "request": request,
@@ -1396,8 +1460,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
       _kodePartController.text = documentSnapshot["kodePart"];
       _modelPartController.text = documentSnapshot["modelPart"];
       _jumlahPartController.text = documentSnapshot["jumlahPart"].toString();
-      _bulanTahunDitemukanController.text =
-          documentSnapshot["bulanTahunDitemukan"];
+      _bulanTahunDitemukanController.text = documentSnapshot["bulanTahunDitemukan"];
       _keteranganDefectController.text = documentSnapshot["keteranganDefect"];
       _ilustrasiController.text = documentSnapshot["ilustrasi"];
       _requestController.text = documentSnapshot["request"];
@@ -1664,7 +1727,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                           child: Row(
                             children: [
                               Text(
-                                'Jumlah Part',
+                                'Jumlah Part Defect',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -1699,7 +1762,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                   width: 2,
                                 ),
                               ),
-                              hintText: 'Jumlah Part',
+                              hintText: 'Jumlah Part Defect',
                             ),
                             readOnly: true,
                           ),
@@ -1806,8 +1869,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                           ),
                         ),
                         Visibility(
-                          visible: _ilustrasiController.text
-                              .isEmpty, // Tampilkan teks jika _urlController kosong
+                          visible: _ilustrasiController.text.isEmpty, // Tampilkan teks jika _urlController kosong
                           replacement: InteractiveViewer(
                             boundaryMargin: const EdgeInsets.all(20),
                             minScale: 0.1,
@@ -2049,8 +2111,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                   _keteranganDefectController.text = "";
                                   _ilustrasiController.text = "";
                                   _requestController.text = "";
-                                  _statusValidasiController.text =
-                                      "Belum Divalidasi";
+                                  _statusValidasiController.text = "Belum Divalidasi";
                                   _create();
                                 },
                                 child: const Row(
@@ -2121,7 +2182,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                     ),
                                   ),
                                   Text(
-                                    'Jumlah Part',
+                                    'Jumlah Part Defect',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -2184,8 +2245,7 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                   .orderBy("timeStamp", descending: true)
                                   .snapshots(),
                               builder: (ctx, streamSnapshot) {
-                                if (streamSnapshot.connectionState ==
-                                    ConnectionState.waiting) {
+                                if (streamSnapshot.connectionState == ConnectionState.waiting) {
                                   return const Center(
                                     child: CircularProgressIndicator(
                                       color: Colors.blue,
@@ -2201,16 +2261,13 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                         .get("bulanTahunDitemukan")
                                         .toString()
                                         .toLowerCase()
-                                        .contains(searchTextBulanTahunDitemukan
-                                            .toLowerCase());
+                                        .contains(searchTextBulanTahunDitemukan.toLowerCase());
                                   }).toList();
                                 }
                                 return ListView.builder(
                                   itemCount: documents.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    final DocumentSnapshot documentSnapshot =
-                                        documents[index];
+                                  itemBuilder: (BuildContext context, int index) {
+                                    final DocumentSnapshot documentSnapshot = documents[index];
                                     return Padding(
                                       padding: const EdgeInsets.all(1),
                                       child: Table(
@@ -2230,86 +2287,63 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                           TableRow(
                                             children: [
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
+                                                padding: const EdgeInsets.all(4.0),
                                                 child: Text(
-                                                  documentSnapshot[
-                                                      "namaSupplier"],
+                                                  documentSnapshot["namaSupplier"],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
+                                                padding: const EdgeInsets.all(4.0),
                                                 child: Text(
                                                   documentSnapshot["namaPart"],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
+                                                padding: const EdgeInsets.all(4.0),
                                                 child: Text(
-                                                  documentSnapshot["jumlahPart"]
-                                                      .toString(),
+                                                  documentSnapshot["jumlahPart"].toString(),
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
+                                                padding: const EdgeInsets.all(4.0),
                                                 child: Text(
-                                                  documentSnapshot[
-                                                      "bulanTahunDitemukan"],
+                                                  documentSnapshot["bulanTahunDitemukan"],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
+                                                padding: const EdgeInsets.all(4.0),
                                                 child: Text(
-                                                  documentSnapshot[
-                                                      "keteranganDefect"],
+                                                  documentSnapshot["keteranganDefect"],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4),
+                                                padding: const EdgeInsets.all(4),
                                                 child: Container(
                                                   decoration: BoxDecoration(
                                                     color: Colors.white70,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
+                                                    borderRadius: BorderRadius.circular(10),
                                                   ),
                                                   child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(4),
+                                                    padding: const EdgeInsets.all(4),
                                                     child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
                                                       children: [
                                                         Icon(
-                                                          documentSnapshot[
-                                                                      "statusValidasi"] ==
-                                                                  "Belum Divalidasi"
-                                                              ? Icons
-                                                                  .cancel_outlined
-                                                              : Icons
-                                                                  .check_circle_outlined,
-                                                          color: documentSnapshot[
-                                                                      "statusValidasi"] ==
-                                                                  "Sudah Divalidasi"
-                                                              ? Colors.red
-                                                              : Colors.green,
+                                                          documentSnapshot["statusValidasi"] == "Belum Divalidasi"
+                                                              ? Icons.cancel_outlined
+                                                              : Icons.check_circle_outlined,
+                                                          color:
+                                                              documentSnapshot["statusValidasi"] == "Sudah Divalidasi"
+                                                                  ? Colors.red
+                                                                  : Colors.green,
                                                         ),
                                                         const SizedBox(
                                                           width: 5,
                                                         ),
                                                         Text(
-                                                          documentSnapshot[
-                                                              "statusValidasi"],
-                                                          style:
-                                                              const TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
+                                                          documentSnapshot["statusValidasi"],
+                                                          style: const TextStyle(
+                                                            fontWeight: FontWeight.bold,
                                                           ),
                                                         ),
                                                       ],
@@ -2320,13 +2354,10 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                               Column(
                                                 children: [
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            4.0),
+                                                    padding: const EdgeInsets.all(4.0),
                                                     child: ElevatedButton.icon(
                                                       onPressed: () {
-                                                        _detail(
-                                                            documentSnapshot);
+                                                        _detail(documentSnapshot);
                                                       },
                                                       icon: const Icon(
                                                         Icons.remove_red_eye,
@@ -2338,13 +2369,10 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            4.0),
+                                                    padding: const EdgeInsets.all(4.0),
                                                     child: ElevatedButton.icon(
                                                       onPressed: () {
-                                                        _update(
-                                                            documentSnapshot);
+                                                        _update(documentSnapshot);
                                                       },
                                                       icon: const Icon(
                                                         Icons.note_alt,
@@ -2356,28 +2384,21 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            4.0),
+                                                    padding: const EdgeInsets.all(4.0),
                                                     child: ElevatedButton.icon(
                                                       onPressed: () {
-                                                        AlertDialog delete =
-                                                            AlertDialog(
+                                                        AlertDialog delete = AlertDialog(
                                                           title: const Text(
                                                             "Peringatan!",
                                                             style: TextStyle(
                                                               color: Colors.red,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
+                                                              fontWeight: FontWeight.bold,
                                                             ),
                                                           ),
                                                           content: SizedBox(
                                                             height: 200,
                                                             child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
                                                                 Text(
                                                                   "Yakin ingin menghapus data *${documentSnapshot["namaPart"]}* ?",
@@ -2388,11 +2409,8 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                                           actions: [
                                                             ElevatedButton(
                                                               onPressed: () {
-                                                                _delete(
-                                                                    documentSnapshot
-                                                                        .id);
-                                                                Navigator.pop(
-                                                                    context);
+                                                                _delete(documentSnapshot.id);
+                                                                Navigator.pop(context);
                                                               },
                                                               child: const Text(
                                                                 "Ya",
@@ -2403,21 +2421,18 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
                                                                 "Tidak",
                                                               ),
                                                               onPressed: () {
-                                                                Navigator.pop(
-                                                                    context);
+                                                                Navigator.pop(context);
                                                               },
                                                             ),
                                                           ],
                                                         );
                                                         showDialog(
                                                           context: context,
-                                                          builder: (context) =>
-                                                              delete,
+                                                          builder: (context) => delete,
                                                         );
                                                       },
                                                       icon: const Icon(
-                                                        Icons
-                                                            .restore_from_trash_outlined,
+                                                        Icons.restore_from_trash_outlined,
                                                         color: Colors.red,
                                                       ),
                                                       label: const Text(

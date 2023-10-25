@@ -45,10 +45,7 @@ class HalamanLihatLPP extends StatefulWidget {
 class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
 // Fungsi untuk mengambil data berdasarkan documentId
   Future<DocumentSnapshot> fetchDataById(String documentId) async {
-    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-        .collection('lpp')
-        .doc(documentId)
-        .get();
+    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection('lpp').doc(documentId).get();
     return documentSnapshot;
   }
 
@@ -162,7 +159,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                       children: [
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text('Jumlah Part',
+                          child: pw.Text('Jumlah Part Defect',
                               textAlign: pw.TextAlign.center,
                               style: pw.TextStyle(
                                 fontWeight: pw.FontWeight.bold,
@@ -254,8 +251,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
   }
 
   // Text fields controllers
-  final TextEditingController _searchTextBulanTahunDitemukanController =
-      TextEditingController();
+  final TextEditingController _searchTextBulanTahunDitemukanController = TextEditingController();
 
   // Search text variable
   String searchTextBulanTahunDitemukan = "";
@@ -267,14 +263,11 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
   final TextEditingController _kodePartController = TextEditingController();
   final TextEditingController _modelPartController = TextEditingController();
   final TextEditingController _jumlahPartController = TextEditingController();
-  final TextEditingController _bulanTahunDitemukanController =
-      TextEditingController();
-  final TextEditingController _keteranganDefectController =
-      TextEditingController();
+  final TextEditingController _bulanTahunDitemukanController = TextEditingController();
+  final TextEditingController _keteranganDefectController = TextEditingController();
   final TextEditingController _ilustrasiController = TextEditingController();
   final TextEditingController _requestController = TextEditingController();
-  final TextEditingController _statusValidasiController =
-      TextEditingController();
+  final TextEditingController _statusValidasiController = TextEditingController();
 
   List<DocumentSnapshot> documents = [];
 
@@ -288,8 +281,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
       _kodePartController.text = documentSnapshot["kodePart"];
       _modelPartController.text = documentSnapshot["modelPart"];
       _jumlahPartController.text = documentSnapshot["jumlahPart"].toString();
-      _bulanTahunDitemukanController.text =
-          documentSnapshot["bulanTahunDitemukan"];
+      _bulanTahunDitemukanController.text = documentSnapshot["bulanTahunDitemukan"];
       _keteranganDefectController.text = documentSnapshot["keteranganDefect"];
       _ilustrasiController.text = documentSnapshot["ilustrasi"];
       _requestController.text = documentSnapshot["request"];
@@ -511,7 +503,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                           child: Row(
                             children: [
                               Text(
-                                'Jumlah Part',
+                                'Jumlah Part Defect',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -547,7 +539,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                   width: 2,
                                 ),
                               ),
-                              hintText: 'Jumlah Part',
+                              hintText: 'Jumlah Part Defect',
                             ),
                           ),
                         ),
@@ -653,8 +645,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                           ),
                         ),
                         Visibility(
-                          visible: _ilustrasiController.text
-                              .isEmpty, // Tampilkan teks jika _urlController kosong
+                          visible: _ilustrasiController.text.isEmpty, // Tampilkan teks jika _urlController kosong
                           replacement: InteractiveViewer(
                             boundaryMargin: const EdgeInsets.all(20),
                             minScale: 0.1,
@@ -801,26 +792,16 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                   ),
                                   onPressed: () async {
                                     if (_formKey.currentState!.validate()) {
-                                      final String timeStamp =
-                                          _timestampController.text;
-                                      final String namaSupplier =
-                                          _namaSupplierController.text;
-                                      final String namaPart =
-                                          _namaPartController.text;
-                                      final String kodePart =
-                                          _kodePartController.text;
-                                      final String modelPart =
-                                          _modelPartController.text;
-                                      final num? jumlahPart = num.tryParse(
-                                          _jumlahPartController.text);
-                                      final String bulanTahunDitemukan =
-                                          _bulanTahunDitemukanController.text;
-                                      final String keteranganDefect =
-                                          _keteranganDefectController.text;
-                                      final String ilustrasi =
-                                          _ilustrasiController.text;
-                                      final String request =
-                                          _requestController.text;
+                                      final String timeStamp = _timestampController.text;
+                                      final String namaSupplier = _namaSupplierController.text;
+                                      final String namaPart = _namaPartController.text;
+                                      final String kodePart = _kodePartController.text;
+                                      final String modelPart = _modelPartController.text;
+                                      final num? jumlahPart = num.tryParse(_jumlahPartController.text);
+                                      final String bulanTahunDitemukan = _bulanTahunDitemukanController.text;
+                                      final String keteranganDefect = _keteranganDefectController.text;
+                                      final String ilustrasi = _ilustrasiController.text;
+                                      final String request = _requestController.text;
 
                                       if (action == "update") {
                                         await FirebaseFirestore.instance
@@ -833,8 +814,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                           "kodePart": kodePart,
                                           "modelPart": modelPart,
                                           "jumlahPart": jumlahPart,
-                                          "bulanTahunDitemukan":
-                                              bulanTahunDitemukan,
+                                          "bulanTahunDitemukan": bulanTahunDitemukan,
                                           "keteranganDefect": keteranganDefect,
                                           "ilustrasi": ilustrasi,
                                           "request": request,
@@ -870,8 +850,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
       _kodePartController.text = documentSnapshot["kodePart"];
       _modelPartController.text = documentSnapshot["modelPart"];
       _jumlahPartController.text = documentSnapshot["jumlahPart"].toString();
-      _bulanTahunDitemukanController.text =
-          documentSnapshot["bulanTahunDitemukan"];
+      _bulanTahunDitemukanController.text = documentSnapshot["bulanTahunDitemukan"];
       _keteranganDefectController.text = documentSnapshot["keteranganDefect"];
       _ilustrasiController.text = documentSnapshot["ilustrasi"];
       _requestController.text = documentSnapshot["request"];
@@ -1138,7 +1117,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                           child: Row(
                             children: [
                               Text(
-                                'Jumlah Part',
+                                'Jumlah Part Defect',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -1173,7 +1152,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                   width: 2,
                                 ),
                               ),
-                              hintText: 'Jumlah Part',
+                              hintText: 'Jumlah Part Defect',
                             ),
                             readOnly: true,
                           ),
@@ -1280,8 +1259,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                           ),
                         ),
                         Visibility(
-                          visible: _ilustrasiController.text
-                              .isEmpty, // Tampilkan teks jika _urlController kosong
+                          visible: _ilustrasiController.text.isEmpty, // Tampilkan teks jika _urlController kosong
                           replacement: InteractiveViewer(
                             boundaryMargin: const EdgeInsets.all(20),
                             minScale: 0.1,
@@ -1523,7 +1501,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                       ),
                                     ),
                                     Text(
-                                      'Jumlah Part',
+                                      'Jumlah Part Defect',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -1591,8 +1569,7 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                     .orderBy("timeStamp", descending: true)
                                     .snapshots(),
                                 builder: (ctx, streamSnapshot) {
-                                  if (streamSnapshot.connectionState ==
-                                      ConnectionState.waiting) {
+                                  if (streamSnapshot.connectionState == ConnectionState.waiting) {
                                     return const Center(
                                       child: CircularProgressIndicator(
                                         color: Colors.blue,
@@ -1602,24 +1579,19 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                   documents = streamSnapshot.data!.docs;
                                   // ToDo Documents list added to filterTitle
 
-                                  if (searchTextBulanTahunDitemukan
-                                      .isNotEmpty) {
+                                  if (searchTextBulanTahunDitemukan.isNotEmpty) {
                                     documents = documents.where((element) {
                                       return element
                                           .get("bulanTahunDitemukan")
                                           .toString()
                                           .toLowerCase()
-                                          .contains(
-                                              searchTextBulanTahunDitemukan
-                                                  .toLowerCase());
+                                          .contains(searchTextBulanTahunDitemukan.toLowerCase());
                                     }).toList();
                                   }
                                   return ListView.builder(
                                     itemCount: documents.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      final DocumentSnapshot documentSnapshot =
-                                          documents[index];
+                                    itemBuilder: (BuildContext context, int index) {
+                                      final DocumentSnapshot documentSnapshot = documents[index];
                                       return Padding(
                                         padding: const EdgeInsets.all(1),
                                         child: Table(
@@ -1639,90 +1611,63 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                             TableRow(
                                               children: [
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
+                                                  padding: const EdgeInsets.all(4.0),
                                                   child: Text(
-                                                    documentSnapshot[
-                                                        "namaSupplier"],
+                                                    documentSnapshot["namaSupplier"],
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
+                                                  padding: const EdgeInsets.all(4.0),
                                                   child: Text(
-                                                    documentSnapshot[
-                                                        "namaPart"],
+                                                    documentSnapshot["namaPart"],
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
+                                                  padding: const EdgeInsets.all(4.0),
                                                   child: Text(
-                                                    documentSnapshot[
-                                                            "jumlahPart"]
-                                                        .toString(),
+                                                    documentSnapshot["jumlahPart"].toString(),
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
+                                                  padding: const EdgeInsets.all(4.0),
                                                   child: Text(
-                                                    documentSnapshot[
-                                                        "bulanTahunDitemukan"],
+                                                    documentSnapshot["bulanTahunDitemukan"],
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
+                                                  padding: const EdgeInsets.all(4.0),
                                                   child: Text(
-                                                    documentSnapshot[
-                                                        "keteranganDefect"],
+                                                    documentSnapshot["keteranganDefect"],
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4),
+                                                  padding: const EdgeInsets.all(4),
                                                   child: Container(
                                                     decoration: BoxDecoration(
                                                       color: Colors.white70,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
+                                                      borderRadius: BorderRadius.circular(10),
                                                     ),
                                                     child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              4),
+                                                      padding: const EdgeInsets.all(4),
                                                       child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
+                                                        mainAxisAlignment: MainAxisAlignment.center,
                                                         children: [
                                                           Icon(
-                                                            documentSnapshot[
-                                                                        "statusValidasi"] ==
-                                                                    "Belum Divalidasi"
-                                                                ? Icons
-                                                                    .cancel_outlined
-                                                                : Icons
-                                                                    .check_circle_outlined,
-                                                            color: documentSnapshot[
-                                                                        "statusValidasi"] ==
-                                                                    "Sudah Divalidasi"
-                                                                ? Colors.red
-                                                                : Colors.green,
+                                                            documentSnapshot["statusValidasi"] == "Belum Divalidasi"
+                                                                ? Icons.cancel_outlined
+                                                                : Icons.check_circle_outlined,
+                                                            color:
+                                                                documentSnapshot["statusValidasi"] == "Sudah Divalidasi"
+                                                                    ? Colors.red
+                                                                    : Colors.green,
                                                           ),
                                                           const SizedBox(
                                                             width: 5,
                                                           ),
                                                           Text(
-                                                            documentSnapshot[
-                                                                "statusValidasi"],
-                                                            style:
-                                                                const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
+                                                            documentSnapshot["statusValidasi"],
+                                                            style: const TextStyle(
+                                                              fontWeight: FontWeight.bold,
                                                             ),
                                                           ),
                                                         ],
@@ -1735,42 +1680,27 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                                     ElevatedButton(
                                                       onPressed: () async {
                                                         final documentId =
-                                                            documentSnapshot
-                                                                .id; // Ganti dengan documentId yang sesuai
-                                                        final document =
-                                                            await fetchDataById(
-                                                                documentId);
-                                                        final pdfBytes =
-                                                            await createPDF(
-                                                                document);
-                                                        await Printing
-                                                            .layoutPdf(
-                                                          onLayout: (PdfPageFormat
-                                                                  format) async =>
-                                                              pdfBytes,
+                                                            documentSnapshot.id; // Ganti dengan documentId yang sesuai
+                                                        final document = await fetchDataById(documentId);
+                                                        final pdfBytes = await createPDF(document);
+                                                        await Printing.layoutPdf(
+                                                          onLayout: (PdfPageFormat format) async => pdfBytes,
                                                         );
                                                         if (!mounted) return;
                                                         Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                PDFScreen(
-                                                                    pdfBytes),
+                                                            builder: (context) => PDFScreen(pdfBytes),
                                                           ),
                                                         );
                                                       },
-                                                      child: const Text(
-                                                          'Generate PDF'),
+                                                      child: const Text('Generate PDF'),
                                                     ),
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              4.0),
-                                                      child:
-                                                          ElevatedButton.icon(
+                                                      padding: const EdgeInsets.all(4.0),
+                                                      child: ElevatedButton.icon(
                                                         onPressed: () {
-                                                          _detail(
-                                                              documentSnapshot);
+                                                          _detail(documentSnapshot);
                                                         },
                                                         icon: const Icon(
                                                           Icons.remove_red_eye,
@@ -1782,38 +1712,27 @@ class _HalamanLihatLPPState extends State<HalamanLihatLPP> {
                                                       ),
                                                     ),
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              4.0),
-                                                      child:
-                                                          ElevatedButton.icon(
+                                                      padding: const EdgeInsets.all(4.0),
+                                                      child: ElevatedButton.icon(
                                                         onPressed: () {
-                                                          documentSnapshot[
-                                                                      "statusValidasi"] ==
-                                                                  "Sudah Divalidasi"
+                                                          documentSnapshot["statusValidasi"] == "Sudah Divalidasi"
                                                               ? null
-                                                              : _update(
-                                                                  documentSnapshot);
+                                                              : _update(documentSnapshot);
                                                         },
                                                         icon: Icon(
-                                                          documentSnapshot[
-                                                                      "statusValidasi"] ==
-                                                                  "Sudah Divalidasi"
+                                                          documentSnapshot["statusValidasi"] == "Sudah Divalidasi"
                                                               ? Icons.check
                                                               : Icons.check_box,
                                                         ),
                                                         label: Text(
-                                                          documentSnapshot[
-                                                                      "statusValidasi"] ==
-                                                                  "Sudah Divalidasi"
+                                                          documentSnapshot["statusValidasi"] == "Sudah Divalidasi"
                                                               ? "Selesai"
                                                               : "Validasi",
                                                           style: TextStyle(
-                                                            color: documentSnapshot[
-                                                                        "statusValidasi"] ==
-                                                                    "Sudah Divalidasi"
-                                                                ? Colors.black
-                                                                : Colors.purple,
+                                                            color:
+                                                                documentSnapshot["statusValidasi"] == "Sudah Divalidasi"
+                                                                    ? Colors.black
+                                                                    : Colors.purple,
                                                           ),
                                                         ),
                                                       ),

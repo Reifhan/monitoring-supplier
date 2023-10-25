@@ -10,10 +10,7 @@ class HomeScreenAdminQC extends StatefulWidget {
   final String? documentIdBulan;
 
   const HomeScreenAdminQC(
-      {super.key,
-      required this.documentIdSupplier,
-      required this.documentIdTahun,
-      required this.documentIdBulan});
+      {super.key, required this.documentIdSupplier, required this.documentIdTahun, required this.documentIdBulan});
 
   @override
   State<HomeScreenAdminQC> createState() => _HomeScreenAdminQCState();
@@ -29,12 +26,9 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
   }
 
   void calculateSum() {
-    final double jumlahPartDefect =
-        double.tryParse(_jumlahPartDefectController.text) ?? 0;
-    final double jumlahTotalKedatangan =
-        double.tryParse(_jumlahTotalKedatanganController.text) ?? 0;
-    final double persentasePartDefect =
-        jumlahPartDefect / jumlahTotalKedatangan * 100;
+    final double jumlahPartDefect = double.tryParse(_jumlahPartDefectController.text) ?? 0;
+    final double jumlahTotalKedatangan = double.tryParse(_jumlahTotalKedatanganController.text) ?? 0;
+    final double persentasePartDefect = jumlahPartDefect / jumlahTotalKedatangan * 100;
     _persentasePartDefectController.text = persentasePartDefect.toString();
   }
 
@@ -70,14 +64,10 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _namaPartController = TextEditingController();
-  final TextEditingController _jumlahPartDefectController =
-      TextEditingController();
-  final TextEditingController _jumlahTotalKedatanganController =
-      TextEditingController();
-  final TextEditingController _persentasePartDefectController =
-      TextEditingController();
-  final TextEditingController _statusValidasiController =
-      TextEditingController();
+  final TextEditingController _jumlahPartDefectController = TextEditingController();
+  final TextEditingController _jumlahTotalKedatanganController = TextEditingController();
+  final TextEditingController _persentasePartDefectController = TextEditingController();
+  final TextEditingController _statusValidasiController = TextEditingController();
   final TextEditingController _notifController = TextEditingController();
   final TextEditingController _timestampController = TextEditingController();
 
@@ -178,8 +168,7 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                       items: items,
                                       onChanged: (value) {
                                         setState(() {
-                                          _namaPartController.text =
-                                              value.toString();
+                                          _namaPartController.text = value.toString();
                                         });
                                       },
                                     );
@@ -288,8 +277,7 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                 ),
                                 hintText: 'Jumlah Total Kedatangan',
                                 prefixIcon: IconButton(
-                                  onPressed:
-                                      _jumlahTotalKedatanganController.clear,
+                                  onPressed: _jumlahTotalKedatanganController.clear,
                                   icon: const Icon(Icons.clear),
                                 ),
                               ),
@@ -368,8 +356,7 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                     style: ButtonStyle(
                                       shape: MaterialStateProperty.all(
                                         RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
+                                          borderRadius: BorderRadius.circular(30),
                                         ),
                                       ),
                                     ),
@@ -384,26 +371,15 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                     ),
                                     onPressed: () async {
                                       if (_formKey.currentState!.validate()) {
-                                        final String namaPart =
-                                            _namaPartController.text;
-                                        final num? jumlahPartDefect =
-                                            num.tryParse(
-                                                _jumlahPartDefectController
-                                                    .text);
+                                        final String namaPart = _namaPartController.text;
+                                        final num? jumlahPartDefect = num.tryParse(_jumlahPartDefectController.text);
                                         final num? jumlahTotalKedatangan =
-                                            num.tryParse(
-                                                _jumlahTotalKedatanganController
-                                                    .text);
+                                            num.tryParse(_jumlahTotalKedatanganController.text);
                                         final num? persentasePartDefect =
-                                            num.tryParse(
-                                                _persentasePartDefectController
-                                                    .text);
-                                        final String statusValidasi =
-                                            _statusValidasiController.text;
-                                        final String notif =
-                                            _notifController.text;
-                                        final String timeStamp =
-                                            _timestampController.text;
+                                            num.tryParse(_persentasePartDefectController.text);
+                                        final String statusValidasi = _statusValidasiController.text;
+                                        final String notif = _notifController.text;
+                                        final String timeStamp = _timestampController.text;
 
                                         if (action == "create") {
                                           await FirebaseFirestore.instance
@@ -416,20 +392,16 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                               .collection('data_part_defect')
                                               .add({
                                             "namaPart": namaPart,
-                                            "jumlahPartDefect":
-                                                jumlahPartDefect,
-                                            "jumlahTotalKedatangan":
-                                                jumlahTotalKedatangan,
-                                            "persentasePartDefect":
-                                                persentasePartDefect,
+                                            "jumlahPartDefect": jumlahPartDefect,
+                                            "jumlahTotalKedatangan": jumlahTotalKedatangan,
+                                            "persentasePartDefect": persentasePartDefect,
                                             "statusValidasi": statusValidasi,
                                           });
 
-                                          await FirebaseFirestore.instance
-                                              .collection('notifikasi')
-                                              .add({
+                                          await FirebaseFirestore.instance.collection('notifikasi').add({
                                             "timeStamp": timeStamp,
                                             "notif": notif,
+                                            "markAsRead": "false",
                                           });
                                         }
 
@@ -437,10 +409,8 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                         _timestampController.text = "";
                                         _namaPartController.text = "";
                                         _jumlahPartDefectController.text = "";
-                                        _jumlahTotalKedatanganController.text =
-                                            "";
-                                        _persentasePartDefectController.text =
-                                            "";
+                                        _jumlahTotalKedatanganController.text = "";
+                                        _persentasePartDefectController.text = "";
 
                                         if (!mounted) return;
                                         Navigator.pop(context);
@@ -470,12 +440,9 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
       action = "update";
 
       _namaPartController.text = documentSnapshot["namaPart"];
-      _jumlahPartDefectController.text =
-          documentSnapshot["jumlahPartDefect"].toString();
-      _jumlahTotalKedatanganController.text =
-          documentSnapshot["jumlahTotalKedatangan"].toString();
-      _persentasePartDefectController.text =
-          documentSnapshot["persentasePartDefect"].toString();
+      _jumlahPartDefectController.text = documentSnapshot["jumlahPartDefect"].toString();
+      _jumlahTotalKedatanganController.text = documentSnapshot["jumlahTotalKedatangan"].toString();
+      _persentasePartDefectController.text = documentSnapshot["persentasePartDefect"].toString();
       _statusValidasiController.text = documentSnapshot["statusValidasi"];
     }
 
@@ -650,8 +617,7 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                               ),
                               hintText: 'Jumlah Total Kedatangan',
                               prefixIcon: IconButton(
-                                onPressed:
-                                    _jumlahTotalKedatanganController.clear,
+                                onPressed: _jumlahTotalKedatanganController.clear,
                                 icon: const Icon(Icons.clear),
                               ),
                             ),
@@ -745,21 +711,13 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                   ),
                                   onPressed: () async {
                                     if (_formKey.currentState!.validate()) {
-                                      final String namaPart =
-                                          _namaPartController.text;
-                                      final num? jumlahPartDefect =
-                                          num.tryParse(
-                                              _jumlahPartDefectController.text);
+                                      final String namaPart = _namaPartController.text;
+                                      final num? jumlahPartDefect = num.tryParse(_jumlahPartDefectController.text);
                                       final num? jumlahTotalKedatangan =
-                                          num.tryParse(
-                                              _jumlahTotalKedatanganController
-                                                  .text);
+                                          num.tryParse(_jumlahTotalKedatanganController.text);
                                       final num? persentasePartDefect =
-                                          num.tryParse(
-                                              _persentasePartDefectController
-                                                  .text);
-                                      final String statusValidasi =
-                                          _statusValidasiController.text;
+                                          num.tryParse(_persentasePartDefectController.text);
+                                      final String statusValidasi = _statusValidasiController.text;
 
                                       if (action == "update") {
                                         await FirebaseFirestore.instance
@@ -774,10 +732,8 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                             .set({
                                           "namaPart": namaPart,
                                           "jumlahPartDefect": jumlahPartDefect,
-                                          "jumlahTotalKedatangan":
-                                              jumlahTotalKedatangan,
-                                          "persentasePartDefect":
-                                              persentasePartDefect,
+                                          "jumlahTotalKedatangan": jumlahTotalKedatangan,
+                                          "persentasePartDefect": persentasePartDefect,
                                           "statusValidasi": statusValidasi,
                                         });
                                       }
@@ -973,8 +929,7 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                           child: StreamBuilder(
                               stream: FirebaseFirestore.instance
                                   .collection("nama_supplier")
-                                  .doc(widget
-                                      .documentIdSupplier) // ID OF DOCUMENT
+                                  .doc(widget.documentIdSupplier) // ID OF DOCUMENT
                                   .snapshots(),
                               builder: (context, snapshot) {
                                 var document = snapshot.data;
@@ -985,10 +940,8 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                     _jumlahPartDefectController.text = "";
                                     _jumlahTotalKedatanganController.text = "";
                                     _persentasePartDefectController.text = "";
-                                    _statusValidasiController.text =
-                                        "Belum Divalidasi";
-                                    _notifController.text =
-                                        "Data ditambahkan: ${document?["namaSupplier"]}";
+                                    _statusValidasiController.text = "Belum Divalidasi";
+                                    _notifController.text = "Data ditambahkan: ${document?["namaSupplier"]}";
                                     _timestampController.text = "$timestamp";
                                     _create();
                                   },
@@ -1097,8 +1050,7 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                     .orderBy("namaPart", descending: false)
                                     .snapshots(),
                                 builder: (ctx, streamSnapshot) {
-                                  if (streamSnapshot.connectionState ==
-                                      ConnectionState.waiting) {
+                                  if (streamSnapshot.connectionState == ConnectionState.waiting) {
                                     return const Center(
                                       child: CircularProgressIndicator(
                                         color: Colors.blue,
@@ -1108,10 +1060,8 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                   documents = (streamSnapshot.data!).docs;
                                   return ListView.builder(
                                     itemCount: documents.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      final DocumentSnapshot documentSnapshot =
-                                          documents[index];
+                                    itemBuilder: (BuildContext context, int index) {
+                                      final DocumentSnapshot documentSnapshot = documents[index];
                                       return Padding(
                                         padding: const EdgeInsets.all(1),
                                         child: Table(
@@ -1130,40 +1080,29 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                             TableRow(
                                               children: [
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
+                                                  padding: const EdgeInsets.all(4.0),
                                                   child: Text(
-                                                    documentSnapshot[
-                                                        "namaPart"],
+                                                    documentSnapshot["namaPart"],
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
+                                                  padding: const EdgeInsets.all(4.0),
                                                   child: Text(
-                                                    documentSnapshot[
-                                                            "jumlahPartDefect"]
-                                                        .toString(),
+                                                    documentSnapshot["jumlahPartDefect"].toString(),
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
+                                                  padding: const EdgeInsets.all(4.0),
                                                   child: Text(
-                                                    documentSnapshot[
-                                                            "jumlahTotalKedatangan"]
-                                                        .toString(),
+                                                    documentSnapshot["jumlahTotalKedatangan"].toString(),
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
+                                                  padding: const EdgeInsets.all(4.0),
                                                   child: Row(
                                                     children: [
                                                       Text(
-                                                        documentSnapshot[
-                                                                "persentasePartDefect"]
-                                                            .toStringAsFixed(2),
+                                                        documentSnapshot["persentasePartDefect"].toStringAsFixed(2),
                                                       ),
                                                       const Text(
                                                         '%',
@@ -1172,49 +1111,33 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4),
+                                                  padding: const EdgeInsets.all(4),
                                                   child: Container(
                                                     decoration: BoxDecoration(
                                                       color: Colors.white70,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
+                                                      borderRadius: BorderRadius.circular(10),
                                                     ),
                                                     child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              4),
+                                                      padding: const EdgeInsets.all(4),
                                                       child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
+                                                        mainAxisAlignment: MainAxisAlignment.center,
                                                         children: [
                                                           Icon(
-                                                            documentSnapshot[
-                                                                        "statusValidasi"] ==
-                                                                    "Belum Divalidasi"
-                                                                ? Icons
-                                                                    .cancel_outlined
-                                                                : Icons
-                                                                    .check_circle_outlined,
-                                                            color: documentSnapshot[
-                                                                        "statusValidasi"] ==
-                                                                    "Sudah Divalidasi"
-                                                                ? Colors.red
-                                                                : Colors.green,
+                                                            documentSnapshot["statusValidasi"] == "Belum Divalidasi"
+                                                                ? Icons.cancel_outlined
+                                                                : Icons.check_circle_outlined,
+                                                            color:
+                                                                documentSnapshot["statusValidasi"] == "Sudah Divalidasi"
+                                                                    ? Colors.red
+                                                                    : Colors.green,
                                                           ),
                                                           const SizedBox(
                                                             width: 5,
                                                           ),
                                                           Text(
-                                                            documentSnapshot[
-                                                                "statusValidasi"],
-                                                            style:
-                                                                const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
+                                                            documentSnapshot["statusValidasi"],
+                                                            style: const TextStyle(
+                                                              fontWeight: FontWeight.bold,
                                                             ),
                                                           ),
                                                         ],
@@ -1225,14 +1148,10 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                                 Column(
                                                   children: [
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              4.0),
-                                                      child:
-                                                          ElevatedButton.icon(
+                                                      padding: const EdgeInsets.all(4.0),
+                                                      child: ElevatedButton.icon(
                                                         onPressed: () {
-                                                          _update(
-                                                              documentSnapshot);
+                                                          _update(documentSnapshot);
                                                         },
                                                         icon: const Icon(
                                                           Icons.note_alt,
@@ -1244,30 +1163,21 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                                       ),
                                                     ),
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              4.0),
-                                                      child:
-                                                          ElevatedButton.icon(
+                                                      padding: const EdgeInsets.all(4.0),
+                                                      child: ElevatedButton.icon(
                                                         onPressed: () {
-                                                          AlertDialog delete =
-                                                              AlertDialog(
+                                                          AlertDialog delete = AlertDialog(
                                                             title: const Text(
                                                               "Peringatan!",
                                                               style: TextStyle(
-                                                                color:
-                                                                    Colors.red,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                color: Colors.red,
+                                                                fontWeight: FontWeight.bold,
                                                               ),
                                                             ),
                                                             content: SizedBox(
                                                               height: 200,
                                                               child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                                 children: [
                                                                   Text(
                                                                     "Yakin ingin menghapus data *${documentSnapshot["namaPart"]}* ?",
@@ -1278,39 +1188,30 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                                             actions: [
                                                               ElevatedButton(
                                                                 onPressed: () {
-                                                                  _delete(
-                                                                      documentSnapshot
-                                                                          .id);
-                                                                  Navigator.pop(
-                                                                      context);
+                                                                  _delete(documentSnapshot.id);
+                                                                  Navigator.pop(context);
                                                                 },
-                                                                child:
-                                                                    const Text(
+                                                                child: const Text(
                                                                   "Ya",
                                                                 ),
                                                               ),
                                                               TextButton(
-                                                                child:
-                                                                    const Text(
+                                                                child: const Text(
                                                                   "Tidak",
                                                                 ),
                                                                 onPressed: () {
-                                                                  Navigator.pop(
-                                                                      context);
+                                                                  Navigator.pop(context);
                                                                 },
                                                               ),
                                                             ],
                                                           );
                                                           showDialog(
                                                             context: context,
-                                                            builder:
-                                                                (context) =>
-                                                                    delete,
+                                                            builder: (context) => delete,
                                                           );
                                                         },
                                                         icon: const Icon(
-                                                          Icons
-                                                              .restore_from_trash_outlined,
+                                                          Icons.restore_from_trash_outlined,
                                                           color: Colors.red,
                                                         ),
                                                         label: const Text(
@@ -1368,20 +1269,17 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                             .collection('data_part_defect')
                                             .get(), // Fetch the documents in the collection
                                         builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
+                                          if (snapshot.connectionState == ConnectionState.waiting) {
                                             return const CircularProgressIndicator(); // Display a loading indicator while fetching data
                                           }
                                           if (snapshot.hasError) {
-                                            return Text(
-                                                'Error: ${snapshot.error}');
+                                            return Text('Error: ${snapshot.error}');
                                           }
                                           if (!snapshot.hasData) {
                                             return const Text('No data found!');
                                           }
 
-                                          int totalDocuments = snapshot.data!
-                                              .size; // Get the total number of documents
+                                          int totalDocuments = snapshot.data!.size; // Get the total number of documents
                                           return Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Text(
@@ -1395,39 +1293,32 @@ class _HomeScreenAdminQCState extends State<HomeScreenAdminQC> {
                                       ),
                                       FutureBuilder<num>(
                                         future: _average(),
-                                        builder: (BuildContext context,
-                                            AsyncSnapshot<num> snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
+                                        builder: (BuildContext context, AsyncSnapshot<num> snapshot) {
+                                          if (snapshot.connectionState == ConnectionState.waiting) {
                                             // Menampilkan indikator loading ketika Future masih berjalan
                                             return const CircularProgressIndicator();
                                           } else if (snapshot.hasError) {
                                             // Menampilkan pesan error jika terjadi kesalahan
                                             return Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text(
-                                                  'Error: ${snapshot.error}'),
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Text('Error: ${snapshot.error}'),
                                             );
                                           } else {
                                             // Menampilkan hasil rata-rata
                                             return Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
+                                              padding: const EdgeInsets.all(8.0),
                                               child: Row(
                                                 children: [
                                                   Text(
                                                     style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      fontWeight: FontWeight.bold,
                                                     ),
                                                     'Rata-rata: ${snapshot.data!.toStringAsFixed(2)}',
                                                   ),
                                                   const Text(
                                                     '%',
                                                     style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      fontWeight: FontWeight.bold,
                                                     ),
                                                   )
                                                 ],

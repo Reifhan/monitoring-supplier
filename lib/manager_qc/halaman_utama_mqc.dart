@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:monitoring_audit_supplier/manager_qc/halaman_buat_lpp.dart';
 import 'package:monitoring_audit_supplier/manager_qc/halaman_supplier_mqc.dart';
 
@@ -12,6 +13,23 @@ class HalamanUtamaMQC extends StatefulWidget {
 }
 
 class _HalamanUtamaMQCState extends State<HalamanUtamaMQC> {
+  String formatTimestampToDisplay(String timestampString) {
+    try {
+      // Parse the timestamp string into a DateTime object.
+      DateTime timestamp = DateTime.parse(timestampString);
+
+      // Define the desired date and time format.
+      final DateFormat formatter = DateFormat('d MMMM y HH:mm:ss:S');
+
+      // Format the timestamp.
+      String formattedTimestamp = formatter.format(timestamp);
+
+      return formattedTimestamp;
+    } catch (e) {
+      return "Invalid Timestamp";
+    }
+  }
+
   List<DocumentSnapshot> documents = [];
 
   @override
@@ -19,10 +37,8 @@ class _HalamanUtamaMQCState extends State<HalamanUtamaMQC> {
     return Scaffold(
       endDrawer: Drawer(
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('notifikasi')
-              .orderBy("timeStamp", descending: true)
-              .snapshots(),
+          stream:
+              FirebaseFirestore.instance.collection('notifikasi').orderBy("timeStamp", descending: true).snapshots(),
           builder: (ctx, streamSnapshot) {
             if (streamSnapshot.connectionState == ConnectionState.waiting) {
               return const Center(
@@ -37,22 +53,44 @@ class _HalamanUtamaMQCState extends State<HalamanUtamaMQC> {
               itemBuilder: (BuildContext context, int index) {
                 final DocumentSnapshot documentSnapshot = documents[index];
                 return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        documentSnapshot["notif"],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                  padding: const EdgeInsets.all(4),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: documentSnapshot["markAsRead"] == "false" ? Colors.blue : Colors.white30,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: Column(
+                        children: [
+                          Text(
+                            documentSnapshot["notif"],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            formatTimestampToDisplay(documentSnapshot["timeStamp"]),
+                            style: const TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
+                          Visibility(
+                            visible: documentSnapshot["markAsRead"] == "false",
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await FirebaseFirestore.instance.collection('notifikasi').doc(documentSnapshot.id).set({
+                                  "notif": documentSnapshot["notif"],
+                                  "timeStamp": documentSnapshot["timeStamp"],
+                                  "markAsRead": "true",
+                                });
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        documentSnapshot["timeStamp"],
-                        style: const TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 );
               },
@@ -63,17 +101,20 @@ class _HalamanUtamaMQCState extends State<HalamanUtamaMQC> {
       appBar: AppBar(
         actions: [
           Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.notifications_active),
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
-              tooltip: "Notifikasi",
+            builder: (context) => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.notifications_active),
+                onPressed: () => Scaffold.of(context).openEndDrawer(),
+                label: const Text("Notifikasi"),
+              ),
             ),
           ),
         ],
         automaticallyImplyLeading: false,
         toolbarHeight: 50,
         flexibleSpace: Container(
-          margin: const EdgeInsets.only(left: 8, right: 8),
+          margin: const EdgeInsets.only(left: 8, right: 150),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -86,6 +127,16 @@ class _HalamanUtamaMQCState extends State<HalamanUtamaMQC> {
                   Icons.logout,
                 ),
                 label: const Text('Logout'),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Hero(
+                  tag: "wima-logo",
+                  child: Image.asset(
+                    'assets/images/wima-logo.png',
+                    height: 300,
+                  ),
+                ),
               ),
               const Padding(
                 padding: EdgeInsets.only(right: 50),
