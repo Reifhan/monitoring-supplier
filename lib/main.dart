@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.paused) {
       // The app is being minimized or closed
       FirebaseAuth.instance.signOut();
     }

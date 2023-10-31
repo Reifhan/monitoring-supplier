@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'halaman_tahun_mqc.dart';
+import 'package:monitoring_audit_supplier/manager_qc/halaman_part_mqc.dart';
 
 class HalamanSupplierMQC extends StatefulWidget {
   const HalamanSupplierMQC({super.key});
@@ -11,8 +11,7 @@ class HalamanSupplierMQC extends StatefulWidget {
 
 class _HalamanSupplierMQCState extends State<HalamanSupplierMQC> {
   // Text fields controllers
-  final TextEditingController _searchTextNamaSupplierController =
-      TextEditingController();
+  final TextEditingController _searchTextNamaSupplierController = TextEditingController();
 
   List<DocumentSnapshot> documents = [];
 
@@ -144,7 +143,7 @@ class _HalamanSupplierMQCState extends State<HalamanSupplierMQC> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => HalamanTahunMQC(
+                                builder: (context) => HalamanPartMQC(
                                   documentIdSupplier: documentSnapshot.id,
                                 ),
                               ),

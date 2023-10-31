@@ -1,22 +1,40 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:monitoring_audit_supplier/admin_qc/halaman_part.dart';
+import 'package:monitoring_audit_supplier/operator_qc/halaman_bulan_oqc.dart';
 
-class HalamanSupplier extends StatefulWidget {
-  const HalamanSupplier({super.key});
+class HalamanTahunOperator extends StatefulWidget {
+  final String? documentIdSupplier;
+  final String? documentIdPart;
+
+  const HalamanTahunOperator({super.key, required this.documentIdSupplier, required this.documentIdPart});
 
   @override
-  State<StatefulWidget> createState() => _HalamanSupplierState();
+  State<StatefulWidget> createState() => _HalamanTahunOperatorState();
 }
 
-class _HalamanSupplierState extends State<HalamanSupplier> {
+class _HalamanTahunOperatorState extends State<HalamanTahunOperator> {
   // Text fields controllers
-  final TextEditingController _searchTextNamaSupplierController = TextEditingController();
+  final TextEditingController _searchTextTahunController = TextEditingController();
+
+  late int selectedYear;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    selectedYear = now.year;
+  }
 
   List<DocumentSnapshot> documents = [];
 
   // Search text variable
-  String searchTextNamaSupplier = "";
+  String searchTextTahun = "";
+
+  // This function is triggered when floating button or one of the edit buttons is pressed
+  // Adding a product if no documentSnapshot is passed
+  // If documentSnapshot != null the update an existing product
+
+  // Deleting a product by id
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +51,14 @@ class _HalamanSupplierState extends State<HalamanSupplier> {
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: TextField(
-                    controller: _searchTextNamaSupplierController,
+                    controller: _searchTextTahunController,
                     onChanged: (value) {
                       setState(() {
-                        searchTextNamaSupplier = value;
+                        searchTextTahun = value;
                       });
                     },
                     decoration: const InputDecoration(
-                      hintText: "Cari Supplier",
+                      hintText: "Cari Tahun",
                       prefixIcon: Icon(
                         Icons.search,
                       ),
@@ -63,8 +81,55 @@ class _HalamanSupplierState extends State<HalamanSupplier> {
                     ),
                     label: const Text('Back'),
                   ),
+                  Row(
+                    children: [
+                      StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('nama_supplier')
+                            .doc(widget.documentIdSupplier)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          var document = snapshot.data!;
+                          return Text(
+                            document["namaSupplier"],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
+                      ),
+                      const Text(' > '),
+                      StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('nama_supplier')
+                            .doc(widget.documentIdSupplier)
+                            .collection('part')
+                            .doc(widget.documentIdPart)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          var document = snapshot.data!;
+                          return Text(
+                            document["part"],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                   const Text(
-                    'List Supplier',
+                    'List Tahun',
                     style: TextStyle(
                       fontSize: 30,
                     ),
@@ -97,8 +162,12 @@ class _HalamanSupplierState extends State<HalamanSupplier> {
           ),
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
-                .collection("nama_supplier")
-                .orderBy("namaSupplier", descending: false)
+                .collection('nama_supplier')
+                .doc(widget.documentIdSupplier)
+                .collection('part')
+                .doc(widget.documentIdPart)
+                .collection('tahun')
+                .orderBy("tahun", descending: true)
                 .snapshots(),
             builder: (ctx, streamSnapshot) {
               if (streamSnapshot.connectionState == ConnectionState.waiting) {
@@ -112,13 +181,9 @@ class _HalamanSupplierState extends State<HalamanSupplier> {
               documents = streamSnapshot.data!.docs;
               // ToDo Documents list added to filterTitle
 
-              if (searchTextNamaSupplier.isNotEmpty) {
+              if (searchTextTahun.isNotEmpty) {
                 documents = documents.where((element) {
-                  return element
-                      .get("namaSupplier")
-                      .toString()
-                      .toLowerCase()
-                      .contains(searchTextNamaSupplier.toLowerCase());
+                  return element.get("tahun").toString().toLowerCase().contains(searchTextTahun.toLowerCase());
                 }).toList();
               }
 
@@ -143,14 +208,16 @@ class _HalamanSupplierState extends State<HalamanSupplier> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => HalamanPart(
-                                  documentIdSupplier: documentSnapshot.id,
+                                builder: (context) => HalamanBulanOperator(
+                                  documentIdSupplier: widget.documentIdSupplier,
+                                  documentIdPart: widget.documentIdPart,
+                                  documentIdTahun: documentSnapshot.id,
                                 ),
                               ),
                             );
                           },
                           title: Text(
-                            "Nama Supplier: ${documentSnapshot["namaSupplier"]}",
+                            "Tahun: ${documentSnapshot["tahun"]}",
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:monitoring_audit_supplier/admin_qc/halaman_utama_aqc.dart';
 import 'package:monitoring_audit_supplier/manager_qc/halaman_utama_mqc.dart';
+import 'package:monitoring_audit_supplier/operator_qc/halaman_supplier_oqc.dart';
 import 'package:monitoring_audit_supplier/staff_qa/halaman_utama_sqa.dart';
 
 class Login extends StatefulWidget {
@@ -171,9 +172,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                   if (value!.isEmpty) {
                                     return "Email tidak boleh kosong!";
                                   }
-                                  if (!RegExp(
-                                          "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
-                                      .hasMatch(value)) {
+                                  if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)) {
                                     return ("Masukkan email yang valid!");
                                   } else {
                                     return null;
@@ -228,9 +227,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                 decoration: InputDecoration(
                                   suffixIcon: IconButton(
                                     icon: Icon(
-                                      _isObscure
-                                          ? Icons.visibility
-                                          : Icons.visibility_off,
+                                      _isObscure ? Icons.visibility : Icons.visibility_off,
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -259,9 +256,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                   right: 500,
                 ),
                 child: ElevatedButton.icon(
-                  icon: _isLoading
-                      ? const CircularProgressIndicator()
-                      : const Icon(Icons.login),
+                  icon: _isLoading ? const CircularProgressIndicator() : const Icon(Icons.login),
                   label: Text(
                     _isLoading ? 'Loading...' : 'Login',
                     style: const TextStyle(fontSize: 20),
@@ -275,8 +270,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                       route();
                     }
                   },
-                  style:
-                      ElevatedButton.styleFrom(fixedSize: const Size(200, 50)),
+                  style: ElevatedButton.styleFrom(fixedSize: const Size(200, 50)),
                 ),
               ),
               const SizedBox(
@@ -291,11 +285,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
 
   void route() {
     User? user = FirebaseAuth.instance.currentUser;
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(user!.uid)
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
+    FirebaseFirestore.instance.collection("users").doc(user!.uid).get().then((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot.exists) {
         if (documentSnapshot.get("role") == "Admin QC") {
           Navigator.of(context).push(
@@ -313,6 +303,12 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const HalamanUtamaSQA(),
+            ),
+          );
+        } else if (documentSnapshot.get("role") == "Operator QC") {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const HalamanSupplierOperator(),
             ),
           );
         }

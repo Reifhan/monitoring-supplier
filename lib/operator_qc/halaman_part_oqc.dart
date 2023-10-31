@@ -1,22 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:monitoring_audit_supplier/admin_qc/halaman_part.dart';
+import 'package:monitoring_audit_supplier/operator_qc/halaman_tahun_oqc.dart';
 
-class HalamanSupplier extends StatefulWidget {
-  const HalamanSupplier({super.key});
+class HalamanPartOperator extends StatefulWidget {
+  final String? documentIdSupplier;
+
+  const HalamanPartOperator({super.key, required this.documentIdSupplier});
 
   @override
-  State<StatefulWidget> createState() => _HalamanSupplierState();
+  State<StatefulWidget> createState() => _HalamanPartOperatorState();
 }
 
-class _HalamanSupplierState extends State<HalamanSupplier> {
+class _HalamanPartOperatorState extends State<HalamanPartOperator> {
   // Text fields controllers
-  final TextEditingController _searchTextNamaSupplierController = TextEditingController();
+  final TextEditingController _searchTextPartController = TextEditingController();
 
   List<DocumentSnapshot> documents = [];
 
   // Search text variable
-  String searchTextNamaSupplier = "";
+  String searchTextPart = "";
+
+  // This function is triggered when floating button or one of the edit buttons is pressed
+  // Adding a product if no documentSnapshot is passed
+  // If documentSnapshot != null the update an existing product
+
+  // Deleting a product by id
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +41,14 @@ class _HalamanSupplierState extends State<HalamanSupplier> {
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: TextField(
-                    controller: _searchTextNamaSupplierController,
+                    controller: _searchTextPartController,
                     onChanged: (value) {
                       setState(() {
-                        searchTextNamaSupplier = value;
+                        searchTextPart = value;
                       });
                     },
                     decoration: const InputDecoration(
-                      hintText: "Cari Supplier",
+                      hintText: "Cari Part",
                       prefixIcon: Icon(
                         Icons.search,
                       ),
@@ -63,8 +71,28 @@ class _HalamanSupplierState extends State<HalamanSupplier> {
                     ),
                     label: const Text('Back'),
                   ),
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('nama_supplier')
+                        .doc(widget.documentIdSupplier)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      var document = snapshot.data!;
+                      return Text(
+                        document["namaSupplier"],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    },
+                  ),
                   const Text(
-                    'List Supplier',
+                    'List Part',
                     style: TextStyle(
                       fontSize: 30,
                     ),
@@ -97,8 +125,10 @@ class _HalamanSupplierState extends State<HalamanSupplier> {
           ),
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
-                .collection("nama_supplier")
-                .orderBy("namaSupplier", descending: false)
+                .collection('nama_supplier')
+                .doc(widget.documentIdSupplier)
+                .collection('part')
+                .orderBy("part", descending: false)
                 .snapshots(),
             builder: (ctx, streamSnapshot) {
               if (streamSnapshot.connectionState == ConnectionState.waiting) {
@@ -112,13 +142,9 @@ class _HalamanSupplierState extends State<HalamanSupplier> {
               documents = streamSnapshot.data!.docs;
               // ToDo Documents list added to filterTitle
 
-              if (searchTextNamaSupplier.isNotEmpty) {
+              if (searchTextPart.isNotEmpty) {
                 documents = documents.where((element) {
-                  return element
-                      .get("namaSupplier")
-                      .toString()
-                      .toLowerCase()
-                      .contains(searchTextNamaSupplier.toLowerCase());
+                  return element.get("part").toString().toLowerCase().contains(searchTextPart.toLowerCase());
                 }).toList();
               }
 
@@ -143,17 +169,29 @@ class _HalamanSupplierState extends State<HalamanSupplier> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => HalamanPart(
-                                  documentIdSupplier: documentSnapshot.id,
+                                builder: (context) => HalamanTahunOperator(
+                                  documentIdSupplier: widget.documentIdSupplier,
+                                  documentIdPart: documentSnapshot.id,
                                 ),
                               ),
                             );
                           },
-                          title: Text(
-                            "Nama Supplier: ${documentSnapshot["namaSupplier"]}",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Nama Part: ${documentSnapshot["part"]}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "Kode Part: ${documentSnapshot["kode"]}",
+                              ),
+                              Text(
+                                "Jenis Part: ${documentSnapshot["jenis"]}",
+                              ),
+                            ],
                           ),
                         ),
                       ],

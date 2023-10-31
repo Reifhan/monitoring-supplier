@@ -1,15 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:monitoring_audit_supplier/admin_qc/halaman_part.dart';
+import 'package:monitoring_audit_supplier/operator_qc/halaman_part_oqc.dart';
 
-class HalamanSupplier extends StatefulWidget {
-  const HalamanSupplier({super.key});
+class HalamanSupplierOperator extends StatefulWidget {
+  const HalamanSupplierOperator({super.key});
 
   @override
-  State<StatefulWidget> createState() => _HalamanSupplierState();
+  State<StatefulWidget> createState() => _HalamanSupplierOperatorState();
 }
 
-class _HalamanSupplierState extends State<HalamanSupplier> {
+class _HalamanSupplierOperatorState extends State<HalamanSupplierOperator> {
   // Text fields controllers
   final TextEditingController _searchTextNamaSupplierController = TextEditingController();
 
@@ -56,12 +57,13 @@ class _HalamanSupplierState extends State<HalamanSupplier> {
                 children: [
                   TextButton.icon(
                     onPressed: () {
+                      FirebaseAuth.instance.signOut();
                       Navigator.of(context).pop();
                     },
                     icon: const Icon(
-                      Icons.arrow_back_ios,
+                      Icons.logout,
                     ),
-                    label: const Text('Back'),
+                    label: const Text('Logout'),
                   ),
                   const Text(
                     'List Supplier',
@@ -143,7 +145,7 @@ class _HalamanSupplierState extends State<HalamanSupplier> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => HalamanPart(
+                                builder: (context) => HalamanPartOperator(
                                   documentIdSupplier: documentSnapshot.id,
                                 ),
                               ),

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:monitoring_audit_supplier/admin_qc/halaman_buat_lpp.dart';
 import 'package:monitoring_audit_supplier/admin_qc/halaman_kelola_part.dart';
 import 'package:monitoring_audit_supplier/admin_qc/halaman_supplier.dart';
 
@@ -96,6 +97,49 @@ class _HalamanUtamaAQCState extends State<HalamanUtamaAQC> {
                         child: Column(
                           children: [
                             Icon(
+                              Icons.paste_sharp,
+                              size: 50,
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              textAlign: TextAlign.center,
+                              "Data Part Defect",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 200,
+                  width: 200,
+                  child: Material(
+                    color: const Color.fromARGB(166, 131, 202, 38),
+                    borderRadius: BorderRadius.circular(20),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const KelolaPart(),
+                          ),
+                        );
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.all(14),
+                        child: Column(
+                          children: [
+                            Icon(
                               Icons.fire_truck_outlined,
                               size: 50,
                             ),
@@ -107,7 +151,7 @@ class _HalamanUtamaAQCState extends State<HalamanUtamaAQC> {
                             ),
                             Text(
                               textAlign: TextAlign.center,
-                              "Part Defect Bulanan",
+                              "Kelola Daftar Part",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
@@ -130,7 +174,7 @@ class _HalamanUtamaAQCState extends State<HalamanUtamaAQC> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const KelolaPart(),
+                            builder: (context) => const HalamanBuatLPP(),
                           ),
                         );
                       },
@@ -139,7 +183,7 @@ class _HalamanUtamaAQCState extends State<HalamanUtamaAQC> {
                         child: Column(
                           children: [
                             Icon(
-                              Icons.perm_data_setting_outlined,
+                              Icons.document_scanner_outlined,
                               size: 50,
                             ),
                             SizedBox(
@@ -150,7 +194,7 @@ class _HalamanUtamaAQCState extends State<HalamanUtamaAQC> {
                             ),
                             Text(
                               textAlign: TextAlign.center,
-                              "Kelola Part",
+                              "Buat LPP",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,

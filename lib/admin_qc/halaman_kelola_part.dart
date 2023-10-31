@@ -20,22 +20,17 @@ class _KelolaPartState extends State<KelolaPart> {
   final _formKey = GlobalKey<FormState>();
 
   // Text fields controllers
-  final TextEditingController _searchTextNamaPartController =
-      TextEditingController();
-  final TextEditingController _searchTextKodePartController =
-      TextEditingController();
-  final TextEditingController _searchTextJenisPartController =
-      TextEditingController();
-  final TextEditingController _searchTextNamaSupplierController =
-      TextEditingController();
+  final TextEditingController _searchTextNamaPartController = TextEditingController();
+  final TextEditingController _searchTextKodePartController = TextEditingController();
+  final TextEditingController _searchTextJenisPartController = TextEditingController();
+  final TextEditingController _searchTextNamaSupplierController = TextEditingController();
   final TextEditingController _namaPartController = TextEditingController();
   final TextEditingController _kodePartController = TextEditingController();
   final TextEditingController _jenisPartController = TextEditingController();
   final TextEditingController _namaSupplierController = TextEditingController();
 
   // Firestore collection reference
-  final CollectionReference _part =
-      FirebaseFirestore.instance.collection("part");
+  final CollectionReference _part = FirebaseFirestore.instance.collection("part");
   List<DocumentSnapshot> documents = [];
 
   // Search text variable
@@ -108,8 +103,7 @@ class _KelolaPartState extends State<KelolaPart> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
-                            color:
-                                action == "create" ? Colors.brown : Colors.pink,
+                            color: action == "create" ? Colors.brown : Colors.pink,
                           ),
                         ),
                       ),
@@ -199,9 +193,7 @@ class _KelolaPartState extends State<KelolaPart> {
                                       _jenisPartController.text = value;
                                     },
                                     itemBuilder: (BuildContext context) {
-                                      return itemsJenisPart
-                                          .map<PopupMenuItem<String>>(
-                                              (String value) {
+                                      return itemsJenisPart.map<PopupMenuItem<String>>((String value) {
                                         return PopupMenuItem(
                                           value: value,
                                           child: Text(
@@ -259,22 +251,16 @@ class _KelolaPartState extends State<KelolaPart> {
                                 label: Text(
                                   action == "create" ? "Tambah" : "Edit",
                                   style: TextStyle(
-                                    color: action == "create"
-                                        ? Colors.black
-                                        : Colors.purple,
+                                    color: action == "create" ? Colors.black : Colors.purple,
                                   ),
                                 ),
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
                                     HapticFeedback.vibrate();
-                                    final String namaPart =
-                                        _namaPartController.text;
-                                    final String kodePart =
-                                        _kodePartController.text;
-                                    final String jenisPart =
-                                        _jenisPartController.text;
-                                    final String namaSupplier =
-                                        _namaSupplierController.text;
+                                    final String namaPart = _namaPartController.text;
+                                    final String kodePart = _kodePartController.text;
+                                    final String jenisPart = _jenisPartController.text;
+                                    final String namaSupplier = _namaSupplierController.text;
 
                                     if (action == "create") {
                                       // Persist a new product to Firestore
@@ -288,9 +274,7 @@ class _KelolaPartState extends State<KelolaPart> {
 
                                     if (action == "update") {
                                       // Update the product
-                                      await _part
-                                          .doc(documentSnapshot!.id)
-                                          .set({
+                                      await _part.doc(documentSnapshot!.id).set({
                                         "namaPart": namaPart,
                                         "kodePart": kodePart,
                                         "jenisPart": jenisPart,
@@ -302,9 +286,7 @@ class _KelolaPartState extends State<KelolaPart> {
                                     if (!mounted) return;
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        backgroundColor: action == "create"
-                                            ? Colors.yellow
-                                            : Colors.grey,
+                                        backgroundColor: action == "create" ? Colors.yellow : Colors.grey,
                                         content: Text(
                                           action == "create"
                                               ? "Successfully create data!"
@@ -639,31 +621,19 @@ class _KelolaPartState extends State<KelolaPart> {
               // ToDo Documents list added to filterTitle
               if (searchTextNamaPart.isNotEmpty) {
                 documents = documents.where((element) {
-                  return element
-                      .get("namaPart")
-                      .toString()
-                      .toLowerCase()
-                      .contains(searchTextNamaPart.toLowerCase());
+                  return element.get("namaPart").toString().toLowerCase().contains(searchTextNamaPart.toLowerCase());
                 }).toList();
               }
 
               if (searchTextKodePart.isNotEmpty) {
                 documents = documents.where((element) {
-                  return element
-                      .get("kodePart")
-                      .toString()
-                      .toLowerCase()
-                      .contains(searchTextKodePart.toLowerCase());
+                  return element.get("kodePart").toString().toLowerCase().contains(searchTextKodePart.toLowerCase());
                 }).toList();
               }
 
               if (searchTextJenisPart.isNotEmpty) {
                 documents = documents.where((element) {
-                  return element
-                      .get("jenisPart")
-                      .toString()
-                      .toLowerCase()
-                      .contains(searchTextJenisPart.toLowerCase());
+                  return element.get("jenisPart").toString().toLowerCase().contains(searchTextJenisPart.toLowerCase());
                 }).toList();
               }
 
@@ -731,8 +701,7 @@ class _KelolaPartState extends State<KelolaPart> {
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             // Press this button to edit a single product
                                             ElevatedButton.icon(
@@ -741,8 +710,7 @@ class _KelolaPartState extends State<KelolaPart> {
                                                 Icons.edit_outlined,
                                                 color: Colors.orange,
                                               ),
-                                              onPressed: () => _createOrUpdate(
-                                                  documentSnapshot),
+                                              onPressed: () => _createOrUpdate(documentSnapshot),
                                             ),
                                             // This icon button is used to delete a single product
                                             ElevatedButton.icon(
@@ -753,22 +721,18 @@ class _KelolaPartState extends State<KelolaPart> {
                                               ),
                                               onPressed: () {
                                                 // Create a delete confirmation dialog
-                                                AlertDialog delete =
-                                                    AlertDialog(
+                                                AlertDialog delete = AlertDialog(
                                                   title: const Text(
                                                     "Peringatan!",
                                                     style: TextStyle(
                                                       color: Colors.red,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      fontWeight: FontWeight.bold,
                                                     ),
                                                   ),
                                                   content: SizedBox(
                                                     height: 200,
                                                     child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
                                                         Text(
                                                           "Yakin ingin menghapus data *${documentSnapshot["namaPart"]}* ?",
@@ -779,9 +743,7 @@ class _KelolaPartState extends State<KelolaPart> {
                                                   actions: [
                                                     ElevatedButton(
                                                       onPressed: () {
-                                                        _deleteProduct(
-                                                            documentSnapshot
-                                                                .id);
+                                                        _deleteProduct(documentSnapshot.id);
                                                         Navigator.pop(context);
                                                       },
                                                       child: const Text(

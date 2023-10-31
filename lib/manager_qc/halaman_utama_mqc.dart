@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:monitoring_audit_supplier/manager_qc/halaman_buat_lpp.dart';
 import 'package:monitoring_audit_supplier/manager_qc/halaman_supplier_mqc.dart';
 
 class HalamanUtamaMQC extends StatefulWidget {
@@ -206,50 +205,7 @@ class _HalamanUtamaMQCState extends State<HalamanUtamaMQC> {
                             ),
                             Text(
                               textAlign: TextAlign.center,
-                              "Data Part Defect Bulanan",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 200,
-                  width: 200,
-                  child: Material(
-                    color: const Color.fromARGB(166, 202, 216, 231),
-                    borderRadius: BorderRadius.circular(20),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(20),
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const HalamanBuatLPP(),
-                          ),
-                        );
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(14),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.document_scanner_outlined,
-                              size: 50,
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              textAlign: TextAlign.center,
-                              "Buat LPP",
+                              "Data Part Defect",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,

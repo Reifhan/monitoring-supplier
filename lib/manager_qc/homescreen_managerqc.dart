@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 class HomeScreenManagerQC extends StatefulWidget {
   final String? documentIdSupplier;
+  final String? documentIdPart;
   final String? documentIdTahun;
   final String? documentIdBulan;
 
@@ -11,20 +12,18 @@ class HomeScreenManagerQC extends StatefulWidget {
       {super.key,
       required this.documentIdSupplier,
       required this.documentIdTahun,
-      required this.documentIdBulan});
+      required this.documentIdBulan,
+      required this.documentIdPart});
 
   @override
   State<HomeScreenManagerQC> createState() => _HomeScreenManagerQCState();
 }
 
 class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
-  void calculateSum() {
-    final double jumlahPartDefect =
-        double.tryParse(_jumlahPartDefectController.text) ?? 0;
-    final double jumlahTotalKedatangan =
-        double.tryParse(_jumlahTotalKedatanganController.text) ?? 0;
-    final double persentasePartDefect =
-        jumlahPartDefect / jumlahTotalKedatangan * 100;
+  void calculatePercentage() {
+    final double jumlahPartDefect = double.tryParse(_jumlahPartDefectController.text) ?? 0;
+    final double jumlahTotalKedatangan = double.tryParse(_jumlahTotalKedatanganController.text) ?? 0;
+    final double persentasePartDefect = jumlahPartDefect / jumlahTotalKedatangan * 100;
     _persentasePartDefectController.text = persentasePartDefect.toString();
   }
 
@@ -32,8 +31,8 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
   void initState() {
     super.initState();
 
-    _jumlahPartDefectController.addListener(calculateSum);
-    _jumlahTotalKedatanganController.addListener(calculateSum);
+    _jumlahPartDefectController.addListener(calculatePercentage);
+    _jumlahTotalKedatanganController.addListener(calculatePercentage);
   }
 
   @override
@@ -45,15 +44,11 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
 
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _namaPartController = TextEditingController();
-  final TextEditingController _jumlahPartDefectController =
-      TextEditingController();
-  final TextEditingController _jumlahTotalKedatanganController =
-      TextEditingController();
-  final TextEditingController _persentasePartDefectController =
-      TextEditingController();
-  final TextEditingController _statusValidasiController =
-      TextEditingController();
+  final TextEditingController _tanggalPengecekanController = TextEditingController();
+  final TextEditingController _jumlahPartDefectController = TextEditingController();
+  final TextEditingController _jumlahTotalKedatanganController = TextEditingController();
+  final TextEditingController _persentasePartDefectController = TextEditingController();
+  final TextEditingController _statusValidasiController = TextEditingController();
 
   List<DocumentSnapshot> documents = [];
 
@@ -61,14 +56,10 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
     String action = "create";
     if (documentSnapshot != null) {
       action = "update";
-
-      _namaPartController.text = documentSnapshot["namaPart"];
-      _jumlahPartDefectController.text =
-          documentSnapshot["jumlahPartDefect"].toString();
-      _jumlahTotalKedatanganController.text =
-          documentSnapshot["jumlahTotalKedatangan"].toString();
-      _persentasePartDefectController.text =
-          documentSnapshot["persentasePartDefect"].toString();
+      _tanggalPengecekanController.text = documentSnapshot["tanggalPengecekan"].toString();
+      _jumlahPartDefectController.text = documentSnapshot["jumlahPartDefect"].toString();
+      _jumlahTotalKedatanganController.text = documentSnapshot["jumlahTotalKedatangan"].toString();
+      _persentasePartDefectController.text = documentSnapshot["persentasePartDefect"].toString();
       _statusValidasiController.text = documentSnapshot["statusValidasi"];
     }
 
@@ -107,7 +98,7 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                           child: Row(
                             children: [
                               Text(
-                                'Nama Part',
+                                'Tanggal Pengecekan',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -125,7 +116,7 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                               }
                               return null;
                             },
-                            controller: _namaPartController,
+                            controller: _tanggalPengecekanController,
                             decoration: const InputDecoration(
                               contentPadding: EdgeInsets.all(20),
                               focusedBorder: OutlineInputBorder(
@@ -140,7 +131,7 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                                   width: 2,
                                 ),
                               ),
-                              hintText: 'Nama Part',
+                              hintText: 'Tanggal Pengecekan',
                             ),
                           ),
                         ),
@@ -327,37 +318,30 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                                   ),
                                   onPressed: () async {
                                     if (_formKey.currentState!.validate()) {
-                                      final String namaPart =
-                                          _namaPartController.text;
-                                      final num? jumlahPartDefect =
-                                          num.tryParse(
-                                              _jumlahPartDefectController.text);
+                                      final String tanggalPengecekan = _tanggalPengecekanController.text;
+                                      final num? jumlahPartDefect = num.tryParse(_jumlahPartDefectController.text);
                                       final num? jumlahTotalKedatangan =
-                                          num.tryParse(
-                                              _jumlahTotalKedatanganController
-                                                  .text);
+                                          num.tryParse(_jumlahTotalKedatanganController.text);
                                       final num? persentasePartDefect =
-                                          num.tryParse(
-                                              _persentasePartDefectController
-                                                  .text);
+                                          num.tryParse(_persentasePartDefectController.text);
 
                                       if (action == "update") {
                                         await FirebaseFirestore.instance
                                             .collection('nama_supplier')
                                             .doc(widget.documentIdSupplier)
+                                            .collection('part')
+                                            .doc(widget.documentIdPart)
                                             .collection('tahun')
                                             .doc(widget.documentIdTahun)
                                             .collection('bulan')
                                             .doc(widget.documentIdBulan)
-                                            .collection('data_part_defect')
+                                            .collection('data_pengecekan')
                                             .doc(documentSnapshot?.id)
                                             .set({
-                                          "namaPart": namaPart,
+                                          "tanggalPengecekan": tanggalPengecekan,
                                           "jumlahPartDefect": jumlahPartDefect,
-                                          "jumlahTotalKedatangan":
-                                              jumlahTotalKedatangan,
-                                          "persentasePartDefect":
-                                              persentasePartDefect,
+                                          "jumlahTotalKedatangan": jumlahTotalKedatangan,
+                                          "persentasePartDefect": persentasePartDefect,
                                           "statusValidasi": "Sudah Divalidasi",
                                         });
                                       }
@@ -451,6 +435,31 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                               stream: FirebaseFirestore.instance
                                   .collection('nama_supplier')
                                   .doc(widget.documentIdSupplier)
+                                  .collection('part')
+                                  .doc(widget.documentIdPart)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                                var document = snapshot.data!;
+                                return Text(
+                                  document["part"],
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              },
+                            ),
+                            const Text(' > '),
+                            StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection('nama_supplier')
+                                  .doc(widget.documentIdSupplier)
+                                  .collection('part')
+                                  .doc(widget.documentIdPart)
                                   .collection('tahun')
                                   .doc(widget.documentIdTahun)
                                   .snapshots(),
@@ -474,6 +483,8 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                               stream: FirebaseFirestore.instance
                                   .collection('nama_supplier')
                                   .doc(widget.documentIdSupplier)
+                                  .collection('part')
+                                  .doc(widget.documentIdPart)
                                   .collection('tahun')
                                   .doc(widget.documentIdTahun)
                                   .collection('bulan')
@@ -497,7 +508,7 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                           ],
                         ),
                         const Text(
-                          'Data Part Defect Bulanan',
+                          'Data Part Defect',
                           style: TextStyle(
                             fontSize: 30,
                           ),
@@ -544,7 +555,7 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                               children: const [
                                 TableRow(children: [
                                   Text(
-                                    'Nama Part',
+                                    'Tanggal Pengecekan',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -607,16 +618,17 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                               stream: FirebaseFirestore.instance
                                   .collection('nama_supplier')
                                   .doc(widget.documentIdSupplier)
+                                  .collection('part')
+                                  .doc(widget.documentIdPart)
                                   .collection('tahun')
                                   .doc(widget.documentIdTahun)
                                   .collection('bulan')
                                   .doc(widget.documentIdBulan)
-                                  .collection('data_part_defect')
-                                  .orderBy("namaPart", descending: false)
+                                  .collection('data_pengecekan')
+                                  .orderBy("tanggalPengecekan", descending: true)
                                   .snapshots(),
                               builder: (ctx, streamSnapshot) {
-                                if (streamSnapshot.connectionState ==
-                                    ConnectionState.waiting) {
+                                if (streamSnapshot.connectionState == ConnectionState.waiting) {
                                   return const Center(
                                     child: CircularProgressIndicator(
                                       color: Colors.blue,
@@ -626,10 +638,8 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                                 documents = (streamSnapshot.data!).docs;
                                 return ListView.builder(
                                   itemCount: documents.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    final DocumentSnapshot documentSnapshot =
-                                        documents[index];
+                                  itemBuilder: (BuildContext context, int index) {
+                                    final DocumentSnapshot documentSnapshot = documents[index];
                                     return Padding(
                                       padding: const EdgeInsets.all(1),
                                       child: Table(
@@ -648,39 +658,29 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                                           TableRow(
                                             children: [
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
+                                                padding: const EdgeInsets.all(4.0),
                                                 child: Text(
-                                                  documentSnapshot["namaPart"],
+                                                  documentSnapshot["tanggalPengecekan"],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
+                                                padding: const EdgeInsets.all(4.0),
                                                 child: Text(
-                                                  documentSnapshot[
-                                                          "jumlahPartDefect"]
-                                                      .toString(),
+                                                  documentSnapshot["jumlahPartDefect"].toString(),
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
+                                                padding: const EdgeInsets.all(4.0),
                                                 child: Text(
-                                                  documentSnapshot[
-                                                          "jumlahTotalKedatangan"]
-                                                      .toString(),
+                                                  documentSnapshot["jumlahTotalKedatangan"].toString(),
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
+                                                padding: const EdgeInsets.all(4.0),
                                                 child: Row(
                                                   children: [
                                                     Text(
-                                                      documentSnapshot[
-                                                              "persentasePartDefect"]
-                                                          .toStringAsFixed(2),
+                                                      documentSnapshot["persentasePartDefect"].toStringAsFixed(2),
                                                     ),
                                                     const Text(
                                                       '%',
@@ -689,47 +689,33 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4),
+                                                padding: const EdgeInsets.all(4),
                                                 child: Container(
                                                   decoration: BoxDecoration(
                                                     color: Colors.white70,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
+                                                    borderRadius: BorderRadius.circular(10),
                                                   ),
                                                   child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(4),
+                                                    padding: const EdgeInsets.all(4),
                                                     child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
                                                       children: [
                                                         Icon(
-                                                          documentSnapshot[
-                                                                      "statusValidasi"] ==
-                                                                  "Belum Divalidasi"
-                                                              ? Icons
-                                                                  .cancel_outlined
-                                                              : Icons
-                                                                  .check_circle_outlined,
-                                                          color: documentSnapshot[
-                                                                      "statusValidasi"] ==
-                                                                  "Sudah Divalidasi"
-                                                              ? Colors.red
-                                                              : Colors.green,
+                                                          documentSnapshot["statusValidasi"] == "Belum Divalidasi"
+                                                              ? Icons.cancel_outlined
+                                                              : Icons.check_circle_outlined,
+                                                          color:
+                                                              documentSnapshot["statusValidasi"] == "Sudah Divalidasi"
+                                                                  ? Colors.red
+                                                                  : Colors.green,
                                                         ),
                                                         const SizedBox(
                                                           width: 5,
                                                         ),
                                                         Text(
-                                                          documentSnapshot[
-                                                              "statusValidasi"],
-                                                          style:
-                                                              const TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
+                                                          documentSnapshot["statusValidasi"],
+                                                          style: const TextStyle(
+                                                            fontWeight: FontWeight.bold,
                                                           ),
                                                         ),
                                                       ],
@@ -738,34 +724,24 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
+                                                padding: const EdgeInsets.all(4.0),
                                                 child: ElevatedButton.icon(
                                                   onPressed: () {
-                                                    documentSnapshot[
-                                                                "statusValidasi"] ==
-                                                            "Sudah Divalidasi"
+                                                    documentSnapshot["statusValidasi"] == "Sudah Divalidasi"
                                                         ? null
-                                                        : _update(
-                                                            documentSnapshot);
+                                                        : _update(documentSnapshot);
                                                   },
                                                   icon: Icon(
-                                                    documentSnapshot[
-                                                                "statusValidasi"] ==
-                                                            "Sudah Divalidasi"
+                                                    documentSnapshot["statusValidasi"] == "Sudah Divalidasi"
                                                         ? Icons.check
                                                         : Icons.check_box,
                                                   ),
                                                   label: Text(
-                                                    documentSnapshot[
-                                                                "statusValidasi"] ==
-                                                            "Sudah Divalidasi"
+                                                    documentSnapshot["statusValidasi"] == "Sudah Divalidasi"
                                                         ? "Selesai"
                                                         : "Validasi",
                                                     style: TextStyle(
-                                                      color: documentSnapshot[
-                                                                  "statusValidasi"] ==
-                                                              "Sudah Divalidasi"
+                                                      color: documentSnapshot["statusValidasi"] == "Sudah Divalidasi"
                                                           ? Colors.black
                                                           : Colors.purple,
                                                     ),
@@ -802,8 +778,10 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                             ),
                             child: Table(
                               columnWidths: const {
-                                0: FlexColumnWidth(9),
-                                1: FlexColumnWidth(4),
+                                0: FlexColumnWidth(2),
+                                1: FlexColumnWidth(2),
+                                2: FlexColumnWidth(4),
+                                3: FlexColumnWidth(5),
                               },
                               border: TableBorder.all(color: Colors.black),
                               children: [
@@ -813,27 +791,26 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                                       future: FirebaseFirestore.instance
                                           .collection("nama_supplier")
                                           .doc(widget.documentIdSupplier)
+                                          .collection('part')
+                                          .doc(widget.documentIdPart)
                                           .collection('tahun')
                                           .doc(widget.documentIdTahun)
                                           .collection('bulan')
                                           .doc(widget.documentIdBulan)
-                                          .collection('data_part_defect')
+                                          .collection('data_pengecekan')
                                           .get(), // Fetch the documents in the collection
                                       builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
                                           return const CircularProgressIndicator(); // Display a loading indicator while fetching data
                                         }
                                         if (snapshot.hasError) {
-                                          return Text(
-                                              'Error: ${snapshot.error}');
+                                          return Text('Error: ${snapshot.error}');
                                         }
                                         if (!snapshot.hasData) {
                                           return const Text('No data found!');
                                         }
 
-                                        int totalDocuments = snapshot.data!
-                                            .size; // Get the total number of documents
+                                        int totalDocuments = snapshot.data!.size; // Get the total number of documents
                                         return Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Text(
@@ -846,19 +823,76 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                                       },
                                     ),
                                     FutureBuilder<num>(
-                                      future: _average(),
-                                      builder: (BuildContext context,
-                                          AsyncSnapshot<num> snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
+                                      future: _sumDefect(),
+                                      builder: (BuildContext context, AsyncSnapshot<num> snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
                                           // Menampilkan indikator loading ketika Future masih berjalan
                                           return const CircularProgressIndicator();
                                         } else if (snapshot.hasError) {
                                           // Menampilkan pesan error jika terjadi kesalahan
                                           return Padding(
                                             padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                                'Error: ${snapshot.error}'),
+                                            child: Text('Error: ${snapshot.error}'),
+                                          );
+                                        } else {
+                                          // Menampilkan hasil total
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  'Total Defect: ${snapshot.data!.toString()}',
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                    FutureBuilder<num>(
+                                      future: _sumTotal(),
+                                      builder: (BuildContext context, AsyncSnapshot<num> snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                          // Menampilkan indikator loading ketika Future masih berjalan
+                                          return const CircularProgressIndicator();
+                                        } else if (snapshot.hasError) {
+                                          // Menampilkan pesan error jika terjadi kesalahan
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text('Error: ${snapshot.error}'),
+                                          );
+                                        } else {
+                                          // Menampilkan hasil total
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  'Total Kedatangan: ${snapshot.data!.toString()}',
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                    FutureBuilder<num>(
+                                      future: _average(),
+                                      builder: (BuildContext context, AsyncSnapshot<num> snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                          // Menampilkan indikator loading ketika Future masih berjalan
+                                          return const CircularProgressIndicator();
+                                        } else if (snapshot.hasError) {
+                                          // Menampilkan pesan error jika terjadi kesalahan
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text('Error: ${snapshot.error}'),
                                           );
                                         } else {
                                           // Menampilkan hasil rata-rata
@@ -877,7 +911,7 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                   ),
-                                                )
+                                                ),
                                               ],
                                             ),
                                           );
@@ -909,11 +943,13 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('nama_supplier')
         .doc(widget.documentIdSupplier)
+        .collection('part')
+        .doc(widget.documentIdPart)
         .collection('tahun')
         .doc(widget.documentIdTahun)
         .collection("bulan")
         .doc(widget.documentIdBulan)
-        .collection("data_part_defect")
+        .collection("data_pengecekan")
         .get();
 
     num average = 0.0;
@@ -924,5 +960,51 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
     }
 
     return (average / querySnapshot.docs.length); // Hitung rata-rata
+  }
+
+  Future<num> _sumDefect() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('nama_supplier')
+        .doc(widget.documentIdSupplier)
+        .collection('part')
+        .doc(widget.documentIdPart)
+        .collection('tahun')
+        .doc(widget.documentIdTahun)
+        .collection("bulan")
+        .doc(widget.documentIdBulan)
+        .collection("data_pengecekan")
+        .get();
+
+    num sumDefect = 0.0;
+    for (var element in querySnapshot.docs) {
+      // here I want to sum
+      num value = element["jumlahPartDefect"];
+      sumDefect += value;
+    }
+
+    return (sumDefect); // Hitung total
+  }
+
+  Future<num> _sumTotal() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('nama_supplier')
+        .doc(widget.documentIdSupplier)
+        .collection('part')
+        .doc(widget.documentIdPart)
+        .collection('tahun')
+        .doc(widget.documentIdTahun)
+        .collection("bulan")
+        .doc(widget.documentIdBulan)
+        .collection("data_pengecekan")
+        .get();
+
+    num sumTotal = 0.0;
+    for (var element in querySnapshot.docs) {
+      // here I want to sum
+      num value = element["jumlahTotalKedatangan"];
+      sumTotal += value;
+    }
+
+    return (sumTotal); // Hitung total
   }
 }

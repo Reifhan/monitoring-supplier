@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:monitoring_audit_supplier/manager_qc/homescreen_managerqc.dart';
+import 'package:monitoring_audit_supplier/operator_qc/homescreen_oqc.dart';
 
-class HalamanBulanMQC extends StatefulWidget {
+class HalamanBulanOperator extends StatefulWidget {
   final String? documentIdSupplier;
   final String? documentIdPart;
   final String? documentIdTahun;
 
-  const HalamanBulanMQC({
+  const HalamanBulanOperator({
     super.key,
     required this.documentIdSupplier,
     required this.documentIdPart,
@@ -15,10 +15,10 @@ class HalamanBulanMQC extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _HalamanBulanMQCState();
+  State<StatefulWidget> createState() => _HalamanBulanOperatorState();
 }
 
-class _HalamanBulanMQCState extends State<HalamanBulanMQC> {
+class _HalamanBulanOperatorState extends State<HalamanBulanOperator> {
   // Text fields controllers
   final TextEditingController _searchTextBulanController = TextEditingController();
 
@@ -241,7 +241,7 @@ class _HalamanBulanMQCState extends State<HalamanBulanMQC> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => HomeScreenManagerQC(
+                                builder: (context) => HomeScreenOperatorQC(
                                   documentIdSupplier: widget.documentIdSupplier,
                                   documentIdPart: widget.documentIdPart,
                                   documentIdTahun: widget.documentIdTahun,

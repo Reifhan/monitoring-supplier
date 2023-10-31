@@ -194,619 +194,632 @@ class _HalamanBuatLPPState extends State<HalamanBuatLPP> {
   Future<void> _create() async {
     String action = "create";
 
-    await showDialog(
+    await showGeneralDialog(
+      transitionDuration: const Duration(milliseconds: 200),
+      barrierDismissible: true,
+      barrierLabel: '',
       context: context,
-      builder: (BuildContext ctx) {
-        return Material(
-          color: Colors.transparent,
-          child: Center(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      barrierColor: Colors.black.withOpacity(0.5),
+      transitionBuilder: (context, a1, a2, Widget AnimatedBuilder) {
+        return Transform.scale(
+          scale: a1.value,
+          child: Opacity(
+            opacity: a1.value,
+            child: AlertDialog(
+              shape: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
-              width: 600, // Dialog width
-              height: 500, // Dialog height
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Tambah Laporan Penyimpangan Part',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 40,
-                          ),
-                        ),
-                      ),
+              title: const Text(
+                'Tambah Laporan Penyimpangan Part',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 40,
+                ),
+              ),
+              content: Material(
+                color: Colors.transparent,
+                child: Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    Form(
-                      key: _formKey,
+                    width: 600, // Dialog width
+                    height: 500, // Dialog height
+                    child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Row(
+                          Form(
+                            key: _formKey,
+                            child: Column(
                               children: [
-                                Text(
-                                  'Nama Supplier',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                const SizedBox(
+                                  height: 10,
                                 ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              readOnly: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required!';
-                                }
-                                return null;
-                              },
-                              controller: _namaSupplierController,
-                              decoration: const InputDecoration(
-                                contentPadding: EdgeInsets.all(20),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.green,
-                                    width: 2,
-                                  ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 2,
-                                  ),
-                                ),
-                                hintText: 'Nama Supplier',
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Nama Part',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              readOnly: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required!';
-                                }
-                                return null;
-                              },
-                              controller: _namaPartController,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.all(20),
-                                focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.green,
-                                    width: 2,
-                                  ),
-                                ),
-                                enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 2,
-                                  ),
-                                ),
-                                hintText: 'Nama Part',
-                                prefixIcon: IconButton(
-                                  onPressed: _namaPartController.clear,
-                                  icon: const Icon(Icons.clear),
-                                ),
-                                suffixIcon: StreamBuilder<QuerySnapshot>(
-                                  stream: getDataPart(),
-                                  builder: (context, snapshot) {
-                                    if (!snapshot.hasData) return const CircularProgressIndicator();
-
-                                    List<String> partOptions = [];
-                                    for (var doc in snapshot.data!.docs) {
-                                      partOptions.add(doc['namaPart']);
-                                    }
-
-                                    return PopupMenuButton<String>(
-                                      icon: const Icon(
-                                        Icons.arrow_drop_down,
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Nama Supplier',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                      tooltip: "Pilih",
-                                      onSelected: (value) {
-                                        setState(() {
-                                          _namaPartController.text = value.toString();
-                                          // Dapatkan supplier dari Firestore dan isi TextField
-                                          _namaSupplierController.text = getSupplierForPart(
-                                            value.toString(),
-                                            snapshot.data!.docs,
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    readOnly: true,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Required!';
+                                      }
+                                      return null;
+                                    },
+                                    controller: _namaSupplierController,
+                                    decoration: const InputDecoration(
+                                      contentPadding: EdgeInsets.all(20),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.green,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      hintText: 'Nama Supplier',
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Nama Part',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    readOnly: true,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Required!';
+                                      }
+                                      return null;
+                                    },
+                                    controller: _namaPartController,
+                                    decoration: InputDecoration(
+                                      contentPadding: const EdgeInsets.all(20),
+                                      focusedBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.green,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      hintText: 'Nama Part',
+                                      prefixIcon: IconButton(
+                                        onPressed: _namaPartController.clear,
+                                        icon: const Icon(Icons.clear),
+                                      ),
+                                      suffixIcon: StreamBuilder<QuerySnapshot>(
+                                        stream: getDataPart(),
+                                        builder: (context, snapshot) {
+                                          if (!snapshot.hasData) return const CircularProgressIndicator();
+
+                                          List<String> partOptions = [];
+                                          for (var doc in snapshot.data!.docs) {
+                                            partOptions.add(doc['namaPart']);
+                                          }
+
+                                          return PopupMenuButton<String>(
+                                            icon: const Icon(
+                                              Icons.arrow_drop_down,
+                                            ),
+                                            tooltip: "Pilih",
+                                            onSelected: (value) {
+                                              setState(() {
+                                                _namaPartController.text = value.toString();
+                                                // Dapatkan supplier dari Firestore dan isi TextField
+                                                _namaSupplierController.text = getSupplierForPart(
+                                                  value.toString(),
+                                                  snapshot.data!.docs,
+                                                );
+                                                _kodePartController.text = getKodeForPart(
+                                                  value.toString(),
+                                                  snapshot.data!.docs,
+                                                );
+                                                _modelPartController.text = getModelForPart(
+                                                  value.toString(),
+                                                  snapshot.data!.docs,
+                                                );
+                                              });
+                                            },
+                                            itemBuilder: (BuildContext context) {
+                                              return partOptions.map((String value) {
+                                                return PopupMenuItem<String>(
+                                                  value: value,
+                                                  child: Text(value),
+                                                );
+                                              }).toList();
+                                            },
                                           );
-                                          _kodePartController.text = getKodeForPart(
-                                            value.toString(),
-                                            snapshot.data!.docs,
-                                          );
-                                          _modelPartController.text = getModelForPart(
-                                            value.toString(),
-                                            snapshot.data!.docs,
-                                          );
-                                        });
-                                      },
-                                      itemBuilder: (BuildContext context) {
-                                        return partOptions.map((String value) {
-                                          return PopupMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList();
-                                      },
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Kode Part',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              readOnly: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required!';
-                                }
-                                return null;
-                              },
-                              controller: _kodePartController,
-                              decoration: const InputDecoration(
-                                contentPadding: EdgeInsets.all(20),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.green,
-                                    width: 2,
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Kode Part',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 2,
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    readOnly: true,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Required!';
+                                      }
+                                      return null;
+                                    },
+                                    controller: _kodePartController,
+                                    decoration: const InputDecoration(
+                                      contentPadding: EdgeInsets.all(20),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.green,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      hintText: 'Kode Part',
+                                    ),
                                   ),
                                 ),
-                                hintText: 'Kode Part',
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Model Part',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Model Part',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              readOnly: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required!';
-                                }
-                                return null;
-                              },
-                              controller: _modelPartController,
-                              decoration: const InputDecoration(
-                                contentPadding: EdgeInsets.all(20),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.green,
-                                    width: 2,
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    readOnly: true,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Required!';
+                                      }
+                                      return null;
+                                    },
+                                    controller: _modelPartController,
+                                    decoration: const InputDecoration(
+                                      contentPadding: EdgeInsets.all(20),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.green,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      hintText: 'Model Part',
+                                    ),
                                   ),
                                 ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 2,
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Jumlah Part Defect',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                hintText: 'Model Part',
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Jumlah Part Defect',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Required!';
+                                      }
+                                      return null;
+                                    },
+                                    controller: _jumlahPartController,
+                                    decoration: InputDecoration(
+                                      contentPadding: const EdgeInsets.all(20),
+                                      focusedBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.green,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      hintText: 'Jumlah Part Defect',
+                                      prefixIcon: IconButton(
+                                        onPressed: _jumlahPartController.clear,
+                                        icon: const Icon(Icons.clear),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required!';
-                                }
-                                return null;
-                              },
-                              controller: _jumlahPartController,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.all(20),
-                                focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.green,
-                                    width: 2,
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Tahun-Bulan Ditemukan',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 2,
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    onTap: () {
+                                      _selectDate(context);
+                                    },
+                                    readOnly: true,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Required!';
+                                      }
+                                      return null;
+                                    },
+                                    controller: _bulanTahunDitemukanController,
+                                    decoration: InputDecoration(
+                                      contentPadding: const EdgeInsets.all(20),
+                                      focusedBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.green,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      hintText: 'Tahun-Bulan Ditemukan',
+                                      prefixIcon: IconButton(
+                                        onPressed: _bulanTahunDitemukanController.clear,
+                                        icon: const Icon(Icons.clear),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                hintText: 'Jumlah Part Defect',
-                                prefixIcon: IconButton(
-                                  onPressed: _jumlahPartController.clear,
-                                  icon: const Icon(Icons.clear),
+                                const SizedBox(
+                                  height: 10,
                                 ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Tahun-Bulan Ditemukan',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Keterangan Defect',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              onTap: () {
-                                _selectDate(context);
-                              },
-                              readOnly: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required!';
-                                }
-                                return null;
-                              },
-                              controller: _bulanTahunDitemukanController,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.all(20),
-                                focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.green,
-                                    width: 2,
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Required!';
+                                      }
+                                      return null;
+                                    },
+                                    controller: _keteranganDefectController,
+                                    decoration: InputDecoration(
+                                      contentPadding: const EdgeInsets.all(20),
+                                      focusedBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.green,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      hintText: 'Keterangan Defect',
+                                      prefixIcon: IconButton(
+                                        onPressed: _keteranganDefectController.clear,
+                                        icon: const Icon(Icons.clear),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 2,
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                ElevatedButton(
+                                  onPressed: _pickImage,
+                                  child: const Text('Pick an Image'),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Ilustrasi',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                hintText: 'Tahun-Bulan Ditemukan',
-                                prefixIcon: IconButton(
-                                  onPressed: _bulanTahunDitemukanController.clear,
-                                  icon: const Icon(Icons.clear),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Keterangan Defect',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    readOnly: true,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Required!';
+                                      }
+                                      return null;
+                                    },
+                                    controller: _ilustrasiController,
+                                    decoration: InputDecoration(
+                                      contentPadding: const EdgeInsets.all(20),
+                                      focusedBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.green,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      hintText: 'URL',
+                                      prefixIcon: IconButton(
+                                        onPressed: _ilustrasiController.clear,
+                                        icon: const Icon(Icons.clear),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required!';
-                                }
-                                return null;
-                              },
-                              controller: _keteranganDefectController,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.all(20),
-                                focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.green,
-                                    width: 2,
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Request',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 2,
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Required!';
+                                      }
+                                      return null;
+                                    },
+                                    controller: _requestController,
+                                    decoration: InputDecoration(
+                                      contentPadding: const EdgeInsets.all(20),
+                                      focusedBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.green,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      hintText: 'Request',
+                                      prefixIcon: IconButton(
+                                        onPressed: _requestController.clear,
+                                        icon: const Icon(Icons.clear),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                hintText: 'Keterangan Defect',
-                                prefixIcon: IconButton(
-                                  onPressed: _keteranganDefectController.clear,
-                                  icon: const Icon(Icons.clear),
+                                const SizedBox(
+                                  height: 30,
                                 ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          ElevatedButton(
-                            onPressed: _pickImage,
-                            child: const Text('Pick an Image'),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Ilustrasi',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              readOnly: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required!';
-                                }
-                                return null;
-                              },
-                              controller: _ilustrasiController,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.all(20),
-                                focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.green,
-                                    width: 2,
-                                  ),
-                                ),
-                                enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 2,
-                                  ),
-                                ),
-                                hintText: 'URL',
-                                prefixIcon: IconButton(
-                                  onPressed: _ilustrasiController.clear,
-                                  icon: const Icon(Icons.clear),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Request',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required!';
-                                }
-                                return null;
-                              },
-                              controller: _requestController,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.all(20),
-                                focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.green,
-                                    width: 2,
-                                  ),
-                                ),
-                                enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 2,
-                                  ),
-                                ),
-                                hintText: 'Request',
-                                prefixIcon: IconButton(
-                                  onPressed: _requestController.clear,
-                                  icon: const Icon(Icons.clear),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 30,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   children: [
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      icon: const Icon(
-                                        Icons.cancel,
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          ElevatedButton.icon(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            icon: const Icon(
+                                              Icons.cancel,
+                                            ),
+                                            label: const Text(
+                                              'Batal',
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      label: const Text(
-                                        'Batal',
+                                    ),
+                                    SizedBox(
+                                      width: 150,
+                                      height: 50,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: ElevatedButton.icon(
+                                          style: ButtonStyle(
+                                            shape: MaterialStateProperty.all(
+                                              RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(30),
+                                              ),
+                                            ),
+                                          ),
+                                          icon: const Icon(
+                                            Icons.add,
+                                          ),
+                                          label: const Text(
+                                            "Tambah",
+                                            style: TextStyle(
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                          onPressed: () async {
+                                            if (_formKey.currentState!.validate()) {
+                                              final String timeStamp = _timestampController.text;
+                                              final String namaSupplier = _namaSupplierController.text;
+                                              final String namaPart = _namaPartController.text;
+                                              final String kodePart = _kodePartController.text;
+                                              final String modelPart = _modelPartController.text;
+                                              final num? jumlahPart = num.tryParse(_jumlahPartController.text);
+                                              final String bulanTahunDitemukan = _bulanTahunDitemukanController.text;
+                                              final String keteranganDefect = _keteranganDefectController.text;
+                                              final String ilustrasi = _ilustrasiController.text;
+                                              final String request = _requestController.text;
+                                              final String statusValidasi = _statusValidasiController.text;
+
+                                              if (action == "create") {
+                                                await FirebaseFirestore.instance.collection('lpp').add({
+                                                  "timeStamp": timeStamp,
+                                                  "namaSupplier": namaSupplier,
+                                                  "namaPart": namaPart,
+                                                  "kodePart": kodePart,
+                                                  "modelPart": modelPart,
+                                                  "jumlahPart": jumlahPart,
+                                                  "bulanTahunDitemukan": bulanTahunDitemukan,
+                                                  "keteranganDefect": keteranganDefect,
+                                                  "ilustrasi": ilustrasi,
+                                                  "request": request,
+                                                  "statusValidasi": statusValidasi,
+                                                });
+                                              }
+
+                                              // Clear the text fields
+                                              _timestampController.text = "";
+                                              _namaSupplierController.text = "";
+                                              _namaPartController.text = "";
+                                              _kodePartController.text = "";
+                                              _modelPartController.text = "";
+                                              _jumlahPartController.text = "";
+                                              _bulanTahunDitemukanController.text = "";
+                                              _keteranganDefectController.text = "";
+                                              _ilustrasiController.text = "";
+                                              _requestController.text = "";
+
+                                              if (!mounted) return;
+                                              Navigator.pop(context);
+                                            }
+                                          },
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                              SizedBox(
-                                width: 150,
-                                height: 50,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: ElevatedButton.icon(
-                                    style: ButtonStyle(
-                                      shape: MaterialStateProperty.all(
-                                        RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(30),
-                                        ),
-                                      ),
-                                    ),
-                                    icon: const Icon(
-                                      Icons.add,
-                                    ),
-                                    label: const Text(
-                                      "Tambah",
-                                      style: TextStyle(
-                                        color: Colors.green,
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      if (_formKey.currentState!.validate()) {
-                                        final String timeStamp = _timestampController.text;
-                                        final String namaSupplier = _namaSupplierController.text;
-                                        final String namaPart = _namaPartController.text;
-                                        final String kodePart = _kodePartController.text;
-                                        final String modelPart = _modelPartController.text;
-                                        final num? jumlahPart = num.tryParse(_jumlahPartController.text);
-                                        final String bulanTahunDitemukan = _bulanTahunDitemukanController.text;
-                                        final String keteranganDefect = _keteranganDefectController.text;
-                                        final String ilustrasi = _ilustrasiController.text;
-                                        final String request = _requestController.text;
-                                        final String statusValidasi = _statusValidasiController.text;
-
-                                        if (action == "create") {
-                                          await FirebaseFirestore.instance.collection('lpp').add({
-                                            "timeStamp": timeStamp,
-                                            "namaSupplier": namaSupplier,
-                                            "namaPart": namaPart,
-                                            "kodePart": kodePart,
-                                            "modelPart": modelPart,
-                                            "jumlahPart": jumlahPart,
-                                            "bulanTahunDitemukan": bulanTahunDitemukan,
-                                            "keteranganDefect": keteranganDefect,
-                                            "ilustrasi": ilustrasi,
-                                            "request": request,
-                                            "statusValidasi": statusValidasi,
-                                          });
-                                        }
-
-                                        // Clear the text fields
-                                        _timestampController.text = "";
-                                        _namaSupplierController.text = "";
-                                        _namaPartController.text = "";
-                                        _kodePartController.text = "";
-                                        _modelPartController.text = "";
-                                        _jumlahPartController.text = "";
-                                        _bulanTahunDitemukanController.text = "";
-                                        _keteranganDefectController.text = "";
-                                        _ilustrasiController.text = "";
-                                        _requestController.text = "";
-
-                                        if (!mounted) return;
-                                        Navigator.pop(context);
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),

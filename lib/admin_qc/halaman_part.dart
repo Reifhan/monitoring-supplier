@@ -1,73 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:monitoring_audit_supplier/admin_qc/halaman_bulan.dart';
+import 'package:monitoring_audit_supplier/admin_qc/halaman_tahun.dart';
 
-class HalamanTahun extends StatefulWidget {
+class HalamanPart extends StatefulWidget {
   final String? documentIdSupplier;
-  final String? documentIdPart;
 
-  const HalamanTahun({super.key, required this.documentIdSupplier, required this.documentIdPart});
+  const HalamanPart({super.key, required this.documentIdSupplier});
 
   @override
-  State<StatefulWidget> createState() => _HalamanTahunState();
+  State<StatefulWidget> createState() => _HalamanPartState();
 }
 
-class _HalamanTahunState extends State<HalamanTahun> {
-  final _formKey = GlobalKey<FormState>();
-
-  var year = [
-    "2018",
-    "2019",
-    "2020",
-    "2021",
-    "2022",
-    "2023",
-    "2024",
-    "2025",
-    "2026",
-    "2027",
-    "2028",
-    "2029",
-    "2030",
-    "2031",
-    "2032",
-    "2033",
-    "2034",
-    "2035",
-    "2036",
-    "2037",
-    "2038",
-    "2039",
-    "2040",
-    "2041",
-    "2042",
-    "2043",
-    "2044",
-    "2045",
-    "2046",
-    "2047",
-    "2048",
-    "2049",
-    "2050"
+class _HalamanPartState extends State<HalamanPart> {
+  var itemsJenisPart = [
+    "Metal Part",
+    "Plastic Part",
+    "General Part",
+    "Electric Part",
   ];
 
+  final _formKey = GlobalKey<FormState>();
+
   // Text fields controllers
-  final TextEditingController _searchTextTahunController = TextEditingController();
-  final TextEditingController _tahunController = TextEditingController();
-
-  late int selectedYear;
-
-  @override
-  void initState() {
-    super.initState();
-    final now = DateTime.now();
-    selectedYear = now.year;
-  }
+  final TextEditingController _searchTextPartController = TextEditingController();
+  final TextEditingController _partController = TextEditingController();
+  final TextEditingController _kodeController = TextEditingController();
+  final TextEditingController _jenisController = TextEditingController();
 
   List<DocumentSnapshot> documents = [];
 
   // Search text variable
-  String searchTextTahun = "";
+  String searchTextPart = "";
 
   // This function is triggered when floating button or one of the edit buttons is pressed
   // Adding a product if no documentSnapshot is passed
@@ -77,7 +40,9 @@ class _HalamanTahunState extends State<HalamanTahun> {
     if (documentSnapshot != null) {
       action = "update";
 
-      _tahunController.text = documentSnapshot["tahun"];
+      _partController.text = documentSnapshot["part"];
+      _kodeController.text = documentSnapshot["kode"];
+      _jenisController.text = documentSnapshot["jenis"];
     }
 
     await showModalBottomSheet(
@@ -98,29 +63,65 @@ class _HalamanTahunState extends State<HalamanTahun> {
                   child: Column(
                     children: [
                       TextFormField(
+                        // The validator receives the text that the user has entered.
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Nama Part tidak boleh kosong!';
+                          }
+                          return null;
+                        },
+                        controller: _partController,
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.all(10),
+                          labelText: "Nama Part",
+                          hintText: "Masukkan Nama Part",
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        // The validator receives the text that the user has entered.
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Kode Part tidak boleh kosong!';
+                          }
+                          return null;
+                        },
+                        controller: _kodeController,
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.all(10),
+                          labelText: "Kode Part",
+                          hintText: "Masukkan Kode Part",
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
                         readOnly: true,
                         // The validator receives the text that the user has entered.
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Tahun tidak boleh kosong!';
+                            return 'Jenis Part tidak boleh kosong!';
                           }
                           return null;
                         },
-                        controller: _tahunController,
+                        controller: _jenisController,
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.all(10),
-                          labelText: "Tahun",
-                          hintText: "Masukkan Tahun",
+                          labelText: "Jenis Part",
+                          hintText: "Masukkan Jenis Part",
                           suffixIcon: PopupMenuButton<String>(
                             icon: const Icon(
-                              Icons.calendar_today,
+                              Icons.arrow_drop_down,
                             ),
                             tooltip: "Pilih",
                             onSelected: (String value) {
-                              _tahunController.text = value;
+                              _jenisController.text = value;
                             },
                             itemBuilder: (BuildContext context) {
-                              return year.map<PopupMenuItem<String>>((String value) {
+                              return itemsJenisPart.map<PopupMenuItem<String>>((String value) {
                                 return PopupMenuItem(
                                   value: value,
                                   child: Text(
@@ -157,7 +158,9 @@ class _HalamanTahunState extends State<HalamanTahun> {
                           ),
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              final String tahun = _tahunController.text;
+                              final String part = _partController.text;
+                              final String kode = _kodeController.text;
+                              final String jenis = _jenisController.text;
 
                               if (action == "create") {
                                 // Persist a new product to Firestore
@@ -165,10 +168,10 @@ class _HalamanTahunState extends State<HalamanTahun> {
                                     .collection('nama_supplier')
                                     .doc(widget.documentIdSupplier)
                                     .collection('part')
-                                    .doc(widget.documentIdPart)
-                                    .collection('tahun')
                                     .add({
-                                  "tahun": tahun,
+                                  "part": part,
+                                  "kode": kode,
+                                  "jenis": jenis,
                                 });
                               }
 
@@ -187,7 +190,7 @@ class _HalamanTahunState extends State<HalamanTahun> {
                               );
 
                               // Clear the text fields
-                              _tahunController.text = "";
+                              _partController.text = "";
 
                               if (!mounted) return;
                               // Hide the bottom sheet
@@ -213,8 +216,6 @@ class _HalamanTahunState extends State<HalamanTahun> {
         .collection('nama_supplier')
         .doc(widget.documentIdSupplier)
         .collection('part')
-        .doc(widget.documentIdPart)
-        .collection('tahun')
         .doc(productId)
         .delete();
 
@@ -248,14 +249,14 @@ class _HalamanTahunState extends State<HalamanTahun> {
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: TextField(
-                    controller: _searchTextTahunController,
+                    controller: _searchTextPartController,
                     onChanged: (value) {
                       setState(() {
-                        searchTextTahun = value;
+                        searchTextPart = value;
                       });
                     },
                     decoration: const InputDecoration(
-                      hintText: "Cari Tahun",
+                      hintText: "Cari Part",
                       prefixIcon: Icon(
                         Icons.search,
                       ),
@@ -278,55 +279,28 @@ class _HalamanTahunState extends State<HalamanTahun> {
                     ),
                     label: const Text('Back'),
                   ),
-                  Row(
-                    children: [
-                      StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection('nama_supplier')
-                            .doc(widget.documentIdSupplier)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                          var document = snapshot.data!;
-                          return Text(
-                            document["namaSupplier"],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          );
-                        },
-                      ),
-                      const Text(' > '),
-                      StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection('nama_supplier')
-                            .doc(widget.documentIdSupplier)
-                            .collection('part')
-                            .doc(widget.documentIdPart)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                          var document = snapshot.data!;
-                          return Text(
-                            document["part"],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('nama_supplier')
+                        .doc(widget.documentIdSupplier)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      var document = snapshot.data!;
+                      return Text(
+                        document["namaSupplier"],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    },
                   ),
                   const Text(
-                    'List Tahun',
+                    'List Part',
                     style: TextStyle(
                       fontSize: 30,
                     ),
@@ -339,9 +313,9 @@ class _HalamanTahunState extends State<HalamanTahun> {
       ),
       floatingActionButton: ElevatedButton.icon(
         icon: const Icon(Icons.add),
-        label: const Text('Tambah Tahun'),
+        label: const Text('Tambah Part'),
         onPressed: () {
-          _tahunController.text = "";
+          _partController.text = "";
           _createOrUpdate();
         },
       ),
@@ -370,9 +344,7 @@ class _HalamanTahunState extends State<HalamanTahun> {
                 .collection('nama_supplier')
                 .doc(widget.documentIdSupplier)
                 .collection('part')
-                .doc(widget.documentIdPart)
-                .collection('tahun')
-                .orderBy("tahun", descending: true)
+                .orderBy("part", descending: false)
                 .snapshots(),
             builder: (ctx, streamSnapshot) {
               if (streamSnapshot.connectionState == ConnectionState.waiting) {
@@ -386,9 +358,9 @@ class _HalamanTahunState extends State<HalamanTahun> {
               documents = streamSnapshot.data!.docs;
               // ToDo Documents list added to filterTitle
 
-              if (searchTextTahun.isNotEmpty) {
+              if (searchTextPart.isNotEmpty) {
                 documents = documents.where((element) {
-                  return element.get("tahun").toString().toLowerCase().contains(searchTextTahun.toLowerCase());
+                  return element.get("part").toString().toLowerCase().contains(searchTextPart.toLowerCase());
                 }).toList();
               }
 
@@ -413,19 +385,29 @@ class _HalamanTahunState extends State<HalamanTahun> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => HalamanBulan(
+                                builder: (context) => HalamanTahun(
                                   documentIdSupplier: widget.documentIdSupplier,
-                                  documentIdPart: widget.documentIdPart,
-                                  documentIdTahun: documentSnapshot.id,
+                                  documentIdPart: documentSnapshot.id,
                                 ),
                               ),
                             );
                           },
-                          title: Text(
-                            "Tahun: ${documentSnapshot["tahun"]}",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Nama Part: ${documentSnapshot["part"]}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "Kode Part: ${documentSnapshot["kode"]}",
+                              ),
+                              Text(
+                                "Jenis Part: ${documentSnapshot["jenis"]}",
+                              ),
+                            ],
                           ),
                           trailing: Padding(
                             padding: const EdgeInsets.all(4),
@@ -465,7 +447,7 @@ class _HalamanTahunState extends State<HalamanTahun> {
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      "Yakin ingin menghapus data *${documentSnapshot["tahun"]}* ?",
+                                                      "Yakin ingin menghapus data *${documentSnapshot["part"]}* ?",
                                                     ),
                                                   ],
                                                 ),

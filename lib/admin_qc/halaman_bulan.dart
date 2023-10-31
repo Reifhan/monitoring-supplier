@@ -4,11 +4,13 @@ import 'package:monitoring_audit_supplier/admin_qc/homescreen_adminqc.dart';
 
 class HalamanBulan extends StatefulWidget {
   final String? documentIdSupplier;
+  final String? documentIdPart;
   final String? documentIdTahun;
 
   const HalamanBulan({
     super.key,
     required this.documentIdSupplier,
+    required this.documentIdPart,
     required this.documentIdTahun,
   });
 
@@ -35,8 +37,7 @@ class _HalamanBulanState extends State<HalamanBulan> {
   ];
 
   // Text fields controllers
-  final TextEditingController _searchTextBulanController =
-      TextEditingController();
+  final TextEditingController _searchTextBulanController = TextEditingController();
   final TextEditingController _bulanController = TextEditingController();
 
   List<DocumentSnapshot> documents = [];
@@ -104,8 +105,7 @@ class _HalamanBulanState extends State<HalamanBulan> {
                               _bulanController.text = value;
                             },
                             itemBuilder: (BuildContext context) {
-                              return month
-                                  .map<PopupMenuItem<String>>((String value) {
+                              return month.map<PopupMenuItem<String>>((String value) {
                                 return PopupMenuItem(
                                   value: value,
                                   child: Text(
@@ -137,9 +137,7 @@ class _HalamanBulanState extends State<HalamanBulan> {
                           label: Text(
                             action == "create" ? "Tambah" : "Edit",
                             style: TextStyle(
-                              color: action == "create"
-                                  ? Colors.black
-                                  : Colors.purple,
+                              color: action == "create" ? Colors.black : Colors.purple,
                             ),
                           ),
                           onPressed: () async {
@@ -148,42 +146,183 @@ class _HalamanBulanState extends State<HalamanBulan> {
 
                               if (action == "create") {
                                 // Persist a new product to Firestore
-                                await FirebaseFirestore.instance
-                                    .collection('nama_supplier')
-                                    .doc(widget.documentIdSupplier)
-                                    .collection('tahun')
-                                    .doc(widget.documentIdTahun)
-                                    .collection('bulan')
-                                    .add({
-                                  "bulan": bulan,
-                                });
-                              }
-
-                              if (action == "update") {
-                                // Update the product
-                                await FirebaseFirestore.instance
-                                    .collection('nama_supplier')
-                                    .doc(widget.documentIdSupplier)
-                                    .collection('tahun')
-                                    .doc(widget.documentIdTahun)
-                                    .collection('bulan')
-                                    .doc(documentSnapshot?.id)
-                                    .set({
-                                  "bulan": bulan,
-                                });
+                                if (bulan == "Januari") {
+                                  await FirebaseFirestore.instance
+                                      .collection('nama_supplier')
+                                      .doc(widget.documentIdSupplier)
+                                      .collection('part')
+                                      .doc(widget.documentIdPart)
+                                      .collection('tahun')
+                                      .doc(widget.documentIdTahun)
+                                      .collection('bulan')
+                                      .add({
+                                    "bulan": bulan,
+                                    "index": 1,
+                                  });
+                                }
+                                if (bulan == "Februari") {
+                                  await FirebaseFirestore.instance
+                                      .collection('nama_supplier')
+                                      .doc(widget.documentIdSupplier)
+                                      .collection('part')
+                                      .doc(widget.documentIdPart)
+                                      .collection('tahun')
+                                      .doc(widget.documentIdTahun)
+                                      .collection('bulan')
+                                      .add({
+                                    "bulan": bulan,
+                                    "index": 2,
+                                  });
+                                }
+                                if (bulan == "Maret") {
+                                  await FirebaseFirestore.instance
+                                      .collection('nama_supplier')
+                                      .doc(widget.documentIdSupplier)
+                                      .collection('part')
+                                      .doc(widget.documentIdPart)
+                                      .collection('tahun')
+                                      .doc(widget.documentIdTahun)
+                                      .collection('bulan')
+                                      .add({
+                                    "bulan": bulan,
+                                    "index": 3,
+                                  });
+                                }
+                                if (bulan == "April") {
+                                  await FirebaseFirestore.instance
+                                      .collection('nama_supplier')
+                                      .doc(widget.documentIdSupplier)
+                                      .collection('part')
+                                      .doc(widget.documentIdPart)
+                                      .collection('tahun')
+                                      .doc(widget.documentIdTahun)
+                                      .collection('bulan')
+                                      .add({
+                                    "bulan": bulan,
+                                    "index": 4,
+                                  });
+                                }
+                                if (bulan == "Mei") {
+                                  await FirebaseFirestore.instance
+                                      .collection('nama_supplier')
+                                      .doc(widget.documentIdSupplier)
+                                      .collection('part')
+                                      .doc(widget.documentIdPart)
+                                      .collection('tahun')
+                                      .doc(widget.documentIdTahun)
+                                      .collection('bulan')
+                                      .add({
+                                    "bulan": bulan,
+                                    "index": 5,
+                                  });
+                                }
+                                if (bulan == "Juni") {
+                                  await FirebaseFirestore.instance
+                                      .collection('nama_supplier')
+                                      .doc(widget.documentIdSupplier)
+                                      .collection('part')
+                                      .doc(widget.documentIdPart)
+                                      .collection('tahun')
+                                      .doc(widget.documentIdTahun)
+                                      .collection('bulan')
+                                      .add({
+                                    "bulan": bulan,
+                                    "index": 6,
+                                  });
+                                }
+                                if (bulan == "Juli") {
+                                  await FirebaseFirestore.instance
+                                      .collection('nama_supplier')
+                                      .doc(widget.documentIdSupplier)
+                                      .collection('part')
+                                      .doc(widget.documentIdPart)
+                                      .collection('tahun')
+                                      .doc(widget.documentIdTahun)
+                                      .collection('bulan')
+                                      .add({
+                                    "bulan": bulan,
+                                    "index": 7,
+                                  });
+                                }
+                                if (bulan == "Agustus") {
+                                  await FirebaseFirestore.instance
+                                      .collection('nama_supplier')
+                                      .doc(widget.documentIdSupplier)
+                                      .collection('part')
+                                      .doc(widget.documentIdPart)
+                                      .collection('tahun')
+                                      .doc(widget.documentIdTahun)
+                                      .collection('bulan')
+                                      .add({
+                                    "bulan": bulan,
+                                    "index": 8,
+                                  });
+                                }
+                                if (bulan == "September") {
+                                  await FirebaseFirestore.instance
+                                      .collection('nama_supplier')
+                                      .doc(widget.documentIdSupplier)
+                                      .collection('part')
+                                      .doc(widget.documentIdPart)
+                                      .collection('tahun')
+                                      .doc(widget.documentIdTahun)
+                                      .collection('bulan')
+                                      .add({
+                                    "bulan": bulan,
+                                    "index": 9,
+                                  });
+                                }
+                                if (bulan == "Oktober") {
+                                  await FirebaseFirestore.instance
+                                      .collection('nama_supplier')
+                                      .doc(widget.documentIdSupplier)
+                                      .collection('part')
+                                      .doc(widget.documentIdPart)
+                                      .collection('tahun')
+                                      .doc(widget.documentIdTahun)
+                                      .collection('bulan')
+                                      .add({
+                                    "bulan": bulan,
+                                    "index": 10,
+                                  });
+                                }
+                                if (bulan == "November") {
+                                  await FirebaseFirestore.instance
+                                      .collection('nama_supplier')
+                                      .doc(widget.documentIdSupplier)
+                                      .collection('part')
+                                      .doc(widget.documentIdPart)
+                                      .collection('tahun')
+                                      .doc(widget.documentIdTahun)
+                                      .collection('bulan')
+                                      .add({
+                                    "bulan": bulan,
+                                    "index": 11,
+                                  });
+                                }
+                                if (bulan == "Desember") {
+                                  await FirebaseFirestore.instance
+                                      .collection('nama_supplier')
+                                      .doc(widget.documentIdSupplier)
+                                      .collection('part')
+                                      .doc(widget.documentIdPart)
+                                      .collection('tahun')
+                                      .doc(widget.documentIdTahun)
+                                      .collection('bulan')
+                                      .add({
+                                    "bulan": bulan,
+                                    "index": 12,
+                                  });
+                                }
                               }
 
                               // Show a snackbar
                               if (!mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  backgroundColor: action == "create"
-                                      ? Colors.black
-                                      : Colors.brown,
+                                  backgroundColor: action == "create" ? Colors.black : Colors.brown,
                                   content: Text(
-                                    action == "create"
-                                        ? "Successfully create data!"
-                                        : "Successfully update data!",
+                                    action == "create" ? "Successfully create data!" : "Successfully update data!",
                                     style: const TextStyle(
                                       color: Colors.white,
                                     ),
@@ -217,6 +356,8 @@ class _HalamanBulanState extends State<HalamanBulan> {
     await FirebaseFirestore.instance
         .collection('nama_supplier')
         .doc(widget.documentIdSupplier)
+        .collection('part')
+        .doc(widget.documentIdPart)
         .collection('tahun')
         .doc(widget.documentIdTahun)
         .collection('bulan')
@@ -310,6 +451,31 @@ class _HalamanBulanState extends State<HalamanBulan> {
                         stream: FirebaseFirestore.instance
                             .collection('nama_supplier')
                             .doc(widget.documentIdSupplier)
+                            .collection('part')
+                            .doc(widget.documentIdPart)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          var document = snapshot.data!;
+                          return Text(
+                            document["part"],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
+                      ),
+                      const Text(' > '),
+                      StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('nama_supplier')
+                            .doc(widget.documentIdSupplier)
+                            .collection('part')
+                            .doc(widget.documentIdPart)
                             .collection('tahun')
                             .doc(widget.documentIdTahun)
                             .snapshots(),
@@ -374,10 +540,12 @@ class _HalamanBulanState extends State<HalamanBulan> {
             stream: FirebaseFirestore.instance
                 .collection('nama_supplier')
                 .doc(widget.documentIdSupplier)
+                .collection('part')
+                .doc(widget.documentIdPart)
                 .collection('tahun')
                 .doc(widget.documentIdTahun)
                 .collection('bulan')
-                .orderBy("bulan", descending: false)
+                .orderBy("index", descending: false)
                 .snapshots(),
             builder: (ctx, streamSnapshot) {
               if (streamSnapshot.connectionState == ConnectionState.waiting) {
@@ -393,11 +561,7 @@ class _HalamanBulanState extends State<HalamanBulan> {
 
               if (searchTextBulan.isNotEmpty) {
                 documents = documents.where((element) {
-                  return element
-                      .get("bulan")
-                      .toString()
-                      .toLowerCase()
-                      .contains(searchTextBulan.toLowerCase());
+                  return element.get("bulan").toString().toLowerCase().contains(searchTextBulan.toLowerCase());
                 }).toList();
               }
 
@@ -424,6 +588,7 @@ class _HalamanBulanState extends State<HalamanBulan> {
                               MaterialPageRoute(
                                 builder: (context) => HomeScreenAdminQC(
                                   documentIdSupplier: widget.documentIdSupplier,
+                                  documentIdPart: widget.documentIdPart,
                                   documentIdTahun: widget.documentIdTahun,
                                   documentIdBulan: documentSnapshot.id,
                                 ),
@@ -444,78 +609,67 @@ class _HalamanBulanState extends State<HalamanBulan> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: SizedBox(
-                                width: 250,
+                                width: 130,
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      // Press this button to edit a single product
-                                      ElevatedButton.icon(
-                                        label: const Text("Update"),
-                                        icon: const Icon(
-                                          Icons.edit_outlined,
-                                          color: Colors.orange,
-                                        ),
-                                        onPressed: () =>
-                                            _createOrUpdate(documentSnapshot),
-                                      ),
                                       // This icon button is used to delete a single product
-                                      ElevatedButton.icon(
-                                        label: const Text("Delete"),
-                                        icon: const Icon(
-                                          Icons.delete_outline,
-                                          color: Colors.red,
-                                        ),
-                                        onPressed: () {
-                                          // Create a delete confirmation dialog
-                                          AlertDialog delete = AlertDialog(
-                                            title: const Text(
-                                              "Peringatan!",
-                                              style: TextStyle(
-                                                color: Colors.red,
-                                                fontWeight: FontWeight.bold,
+                                      Center(
+                                        child: ElevatedButton.icon(
+                                          label: const Text("Delete"),
+                                          icon: const Icon(
+                                            Icons.delete_outline,
+                                            color: Colors.red,
+                                          ),
+                                          onPressed: () {
+                                            // Create a delete confirmation dialog
+                                            AlertDialog delete = AlertDialog(
+                                              title: const Text(
+                                                "Peringatan!",
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
-                                            ),
-                                            content: SizedBox(
-                                              height: 200,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    "Yakin ingin menghapus data *${documentSnapshot["bulan"]}* ?",
+                                              content: SizedBox(
+                                                height: 200,
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Yakin ingin menghapus data *${documentSnapshot["bulan"]}* ?",
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              actions: [
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    _deleteProduct(documentSnapshot.id);
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: const Text(
+                                                    "Ya",
                                                   ),
-                                                ],
-                                              ),
-                                            ),
-                                            actions: [
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  _deleteProduct(
-                                                      documentSnapshot.id);
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text(
-                                                  "Ya",
                                                 ),
-                                              ),
-                                              TextButton(
-                                                child: const Text(
-                                                  "Tidak",
+                                                TextButton(
+                                                  child: const Text(
+                                                    "Tidak",
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
                                                 ),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                              ),
-                                            ],
-                                          );
-                                          showDialog(
-                                            context: context,
-                                            builder: (context) => delete,
-                                          );
-                                        },
+                                              ],
+                                            );
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) => delete,
+                                            );
+                                          },
+                                        ),
                                       ),
                                     ],
                                   ),

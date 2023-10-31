@@ -4,8 +4,9 @@ import 'package:monitoring_audit_supplier/manager_qc/halaman_bulan_mqc.dart';
 
 class HalamanTahunMQC extends StatefulWidget {
   final String? documentIdSupplier;
+  final String? documentIdPart;
 
-  const HalamanTahunMQC({super.key, required this.documentIdSupplier});
+  const HalamanTahunMQC({super.key, required this.documentIdSupplier, required this.documentIdPart});
 
   @override
   State<StatefulWidget> createState() => _HalamanTahunMQCState();
@@ -13,13 +14,27 @@ class HalamanTahunMQC extends StatefulWidget {
 
 class _HalamanTahunMQCState extends State<HalamanTahunMQC> {
   // Text fields controllers
-  final TextEditingController _searchTextTahunController =
-      TextEditingController();
+  final TextEditingController _searchTextTahunController = TextEditingController();
+
+  late int selectedYear;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    selectedYear = now.year;
+  }
 
   List<DocumentSnapshot> documents = [];
 
   // Search text variable
   String searchTextTahun = "";
+
+  // This function is triggered when floating button or one of the edit buttons is pressed
+  // Adding a product if no documentSnapshot is passed
+  // If documentSnapshot != null the update an existing product
+
+  // Deleting a product by id
 
   @override
   Widget build(BuildContext context) {
@@ -66,25 +81,52 @@ class _HalamanTahunMQCState extends State<HalamanTahunMQC> {
                     ),
                     label: const Text('Back'),
                   ),
-                  StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('nama_supplier')
-                        .doc(widget.documentIdSupplier)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      var document = snapshot.data!;
-                      return Text(
-                        document["namaSupplier"],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    },
+                  Row(
+                    children: [
+                      StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('nama_supplier')
+                            .doc(widget.documentIdSupplier)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          var document = snapshot.data!;
+                          return Text(
+                            document["namaSupplier"],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
+                      ),
+                      const Text(' > '),
+                      StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('nama_supplier')
+                            .doc(widget.documentIdSupplier)
+                            .collection('part')
+                            .doc(widget.documentIdPart)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          var document = snapshot.data!;
+                          return Text(
+                            document["part"],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                   const Text(
                     'List Tahun',
@@ -122,8 +164,10 @@ class _HalamanTahunMQCState extends State<HalamanTahunMQC> {
             stream: FirebaseFirestore.instance
                 .collection('nama_supplier')
                 .doc(widget.documentIdSupplier)
+                .collection('part')
+                .doc(widget.documentIdPart)
                 .collection('tahun')
-                .orderBy("tahun", descending: false)
+                .orderBy("tahun", descending: true)
                 .snapshots(),
             builder: (ctx, streamSnapshot) {
               if (streamSnapshot.connectionState == ConnectionState.waiting) {
@@ -139,11 +183,7 @@ class _HalamanTahunMQCState extends State<HalamanTahunMQC> {
 
               if (searchTextTahun.isNotEmpty) {
                 documents = documents.where((element) {
-                  return element
-                      .get("tahun")
-                      .toString()
-                      .toLowerCase()
-                      .contains(searchTextTahun.toLowerCase());
+                  return element.get("tahun").toString().toLowerCase().contains(searchTextTahun.toLowerCase());
                 }).toList();
               }
 
@@ -170,6 +210,7 @@ class _HalamanTahunMQCState extends State<HalamanTahunMQC> {
                               MaterialPageRoute(
                                 builder: (context) => HalamanBulanMQC(
                                   documentIdSupplier: widget.documentIdSupplier,
+                                  documentIdPart: widget.documentIdPart,
                                   documentIdTahun: documentSnapshot.id,
                                 ),
                               ),
