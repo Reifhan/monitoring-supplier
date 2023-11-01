@@ -45,6 +45,7 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _tanggalPengecekanController = TextEditingController();
+  final TextEditingController _jumlahPartGoodController = TextEditingController();
   final TextEditingController _jumlahPartDefectController = TextEditingController();
   final TextEditingController _jumlahTotalKedatanganController = TextEditingController();
   final TextEditingController _persentasePartDefectController = TextEditingController();
@@ -57,6 +58,7 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
     if (documentSnapshot != null) {
       action = "update";
       _tanggalPengecekanController.text = documentSnapshot["tanggalPengecekan"].toString();
+      _jumlahPartGoodController.text = documentSnapshot["jumlahPartGood"].toString();
       _jumlahPartDefectController.text = documentSnapshot["jumlahPartDefect"].toString();
       _jumlahTotalKedatanganController.text = documentSnapshot["jumlahTotalKedatangan"].toString();
       _persentasePartDefectController.text = documentSnapshot["persentasePartDefect"].toString();
@@ -319,6 +321,7 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                                   onPressed: () async {
                                     if (_formKey.currentState!.validate()) {
                                       final String tanggalPengecekan = _tanggalPengecekanController.text;
+                                      final num? jumlahPartGood = num.tryParse(_jumlahPartGoodController.text);
                                       final num? jumlahPartDefect = num.tryParse(_jumlahPartDefectController.text);
                                       final num? jumlahTotalKedatangan =
                                           num.tryParse(_jumlahTotalKedatanganController.text);
@@ -339,6 +342,7 @@ class _HomeScreenManagerQCState extends State<HomeScreenManagerQC> {
                                             .doc(documentSnapshot?.id)
                                             .set({
                                           "tanggalPengecekan": tanggalPengecekan,
+                                          "jumlahPartGood": jumlahPartGood,
                                           "jumlahPartDefect": jumlahPartDefect,
                                           "jumlahTotalKedatangan": jumlahTotalKedatangan,
                                           "persentasePartDefect": persentasePartDefect,

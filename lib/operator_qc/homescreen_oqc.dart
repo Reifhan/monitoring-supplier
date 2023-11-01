@@ -355,25 +355,21 @@ class _HomeScreenOperatorQCState extends State<HomeScreenOperatorQC> {
                                   return null;
                                 },
                                 controller: _jumlahTotalKedatanganController,
-                                decoration: InputDecoration(
-                                  contentPadding: const EdgeInsets.all(20),
-                                  focusedBorder: const OutlineInputBorder(
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.all(20),
+                                  focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Colors.green,
                                       width: 2,
                                     ),
                                   ),
-                                  enabledBorder: const OutlineInputBorder(
+                                  enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Colors.black,
                                       width: 2,
                                     ),
                                   ),
                                   hintText: 'Jumlah Total Kedatangan',
-                                  prefixIcon: IconButton(
-                                    onPressed: _jumlahTotalKedatanganController.clear,
-                                    icon: const Icon(Icons.clear),
-                                  ),
                                 ),
                               ),
                             ),

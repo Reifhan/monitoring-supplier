@@ -191,6 +191,8 @@ class _HalamanPartState extends State<HalamanPart> {
 
                               // Clear the text fields
                               _partController.text = "";
+                              _kodeController.text = "";
+                              _jenisController.text = "";
 
                               if (!mounted) return;
                               // Hide the bottom sheet
@@ -315,7 +317,10 @@ class _HalamanPartState extends State<HalamanPart> {
         icon: const Icon(Icons.add),
         label: const Text('Tambah Part'),
         onPressed: () {
+          // Clear the text fields
           _partController.text = "";
+          _kodeController.text = "";
+          _jenisController.text = "";
           _createOrUpdate();
         },
       ),
